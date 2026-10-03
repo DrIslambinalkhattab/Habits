@@ -821,6 +821,7 @@
     ChevronDown: [['path', {d:'M6 9l6 6 6-6'}]],
     ChevronUp: [['path', {d:'M18 15l-6-6-6 6'}]],
     Flame: [['path', {d:'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'}]],
+    VolumeX: [['path',{d:'M11 5L6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6'}]],
     Settings2: [['path', {d:'M20 7h-9M14 17H5'}], ['circle', {cx:'17', cy:'17', r:'3'}], ['circle', {cx:'7', cy:'7', r:'3'}]],
     Pencil: [['path', {d:'M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'}]],
     Trash2: [['path', {d:'M3 6h18'}], ['path', {d:'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'}], ['path', {d:'M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6'}], ['path', {d:'M10 11v6'}], ['path', {d:'M14 11v6'}]],
@@ -1666,7 +1667,84 @@
   })();
 
   /* ================= TOP BAR + HERO ================= */
+  /* ================= SFX · أصوات الإنجاز (Web Audio مُولَّدة، بدون ملفات) ================= */
+  var SFX = (function(){
+    var KEY = 'ui.sfx.muted'; /* بدون بادئة athar. حتى لا تُزامَن مع Supabase */
+    var ctx = null, master = null, wet = null, lastSub = 0, lastSubAt = 0, muted = false;
+    try{ muted = window.localStorage.getItem(KEY) === '1'; }catch(e){}
+    var PENT = [0,2,4,7,9,12,14,16]; /* سلّم خماسي: ضغطات متتالية = نغمات صاعدة */
+    function init(){
+      if(ctx) return ctx;
+      var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
+      try{
+        ctx = new AC();
+        var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 4;
+        master = ctx.createGain(); master.gain.value = 0.55; master.connect(comp); comp.connect(ctx.destination);
+        /* reverb خفيف مُولَّد */
+        var len = Math.floor(ctx.sampleRate*1.1), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+        for(var c=0;c<2;c++){ var d = buf.getChannelData(c); for(var i=0;i<len;i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/len, 2.6); }
+        var conv = ctx.createConvolver(); conv.buffer = buf;
+        wet = ctx.createGain(); wet.gain.value = 0.22; conv.connect(wet); wet.connect(master);
+        ctx._conv = conv;
+      }catch(e){ ctx = null; }
+      return ctx;
+    }
+    function tone(f, t0, dur, vol, type){
+      var o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine'; o.frequency.value = f;
+      o2.type = 'triangle'; o2.frequency.value = f*2.005; /* هارمونيك ناعم يعطي لمعة */
+      var g2 = ctx.createGain(); g2.gain.value = 0.18;
+      o.connect(g); o2.connect(g2); g2.connect(g);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol, t0+0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+      g.connect(master); g.connect(ctx._conv);
+      o.start(t0); o2.start(t0); o.stop(t0+dur+0.05); o2.stop(t0+dur+0.05);
+    }
+    function hz(base, semi){ return base*Math.pow(2, semi/12); }
+    var voices = {
+      sub: function(t){ /* نقرة ناعمة صاعدة */
+        var now = Date.now(); lastSub = (now-lastSubAt < 1600) ? Math.min(lastSub+1, PENT.length-1) : 0; lastSubAt = now;
+        var f = hz(784, PENT[lastSub]);
+        tone(f, t, 0.22, 0.20); tone(f*1.5, t+0.045, 0.28, 0.12);
+      },
+      task: function(t){ /* ding-ding مشرق */
+        tone(1046.5, t, 0.45, 0.24); tone(1568, t+0.075, 0.6, 0.22); tone(2093, t+0.075, 0.5, 0.06);
+      },
+      habit: function(t){ /* أربيجيو ثلاثي دافئ */
+        [523.25, 659.25, 783.99].forEach(function(f,i){ tone(f, t+i*0.065, 0.6, 0.20); });
+        tone(1046.5, t+0.2, 0.95, 0.20); tone(1318.5, t+0.2, 0.8, 0.07);
+      },
+      perfect: function(t){ /* احتفال اليوم المثالي */
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function(f,i){ tone(f, t+i*0.085, 0.8, 0.20); });
+        var e = t+0.5; [1046.5, 1318.5, 1568, 2093].forEach(function(f,i){ tone(f, e+i*0.012, 1.6, 0.16 - i*0.02); });
+        tone(261.63, t, 1.8, 0.22);
+      }
+    };
+    function vib(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+    var buzz = { sub:8, task:[10,30,14], habit:[10,40,16], perfect:[12,50,12,50,28] };
+    var lastHabitAt = 0;
+    function play(name){
+      if(muted || !voices[name]) return;
+      var c = init(); if(!c) return;
+      try{
+        if(c.state === 'suspended') c.resume();
+        var t = c.currentTime + 0.01;
+        if(name === 'habit'){ lastHabitAt = Date.now(); if(Date.now()-lastSubAt < 300) t += 0.12; } /* بعد نقرة آخر مهمة فرعية */
+        if(name === 'perfect') t += (Date.now()-lastHabitAt < 500) ? 0.5 : 0.05; /* بعد نغمة العادة */
+        voices[name](t);
+        vib(buzz[name]);
+      }catch(e){}
+    }
+    function setMuted(m){ muted = !!m; try{ window.localStorage.setItem(KEY, muted?'1':'0'); }catch(e){} if(!muted) play('sub'); return !muted; }
+    /* فتح الصوت عند أول لمسة (iOS/Safari) */
+    function unlock(){ var c = init(); if(c && c.state==='suspended') c.resume(); window.removeEventListener('pointerdown', unlock, true); }
+    window.addEventListener('pointerdown', unlock, true);
+    return { play:play, isOn:function(){ return !muted; }, toggle:function(){ return setMuted(!muted); } };
+  })();
+
   function TopBar(props){
+    var sfx = useState(SFX.isOn()); var sfxOn = sfx[0], setSfxOn = sfx[1];
     return h('div', {className:'sticky top-0 z-40 bg-surface/85 backdrop-blur-md border-b border-line shadow-[0_1px_0_rgba(22,33,44,0.02)]'},
       h('div', {className:'app-wrap mx-auto px-5 md:px-8 h-[68px] grid grid-cols-[1fr_auto_1fr] items-center gap-3'},
         h('div', {className:'flex items-center gap-2.5 shrink-0 justify-self-start'},
@@ -1674,6 +1752,8 @@
           h('span', {className:'hidden sm:inline text-[17px] font-extrabold tracking-tightish'}, 'أثر')),
         h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'}], value:props.view, onChange:props.setView})),
         h('div', {className:'flex items-center gap-2 shrink-0 justify-self-end'},
+          h('button', {onClick:function(){ setSfxOn(SFX.toggle()); }, 'aria-label':sfxOn?'كتم أصوات الإنجاز':'تشغيل أصوات الإنجاز', 'aria-pressed':sfxOn, title:sfxOn?'الصوت: مفعّل':'الصوت: مكتوم',
+            className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
           h('button', {onClick:props.onSettings, 'aria-label':'الإعدادات', className:'w-9 h-9 rounded-full flex items-center justify-center text-inksoft hover:bg-linesoft hover:text-ink transition-smooth focus-ring'}, h(Icon,{name:'Settings2', size:16})),
           h('button', {onClick:props.onAdd, className:'btn-primary flex items-center gap-1.5 h-9 px-4 rounded-full text-white text-[13px] font-bold active:scale-95 transition-smooth focus-ring'},
             h(Icon,{name:'Plus', size:14, strokeWidth:2.4}), h('span',{className:'hidden sm:inline'}, props.addLabel || 'عادة جديدة')))));
@@ -1902,6 +1982,7 @@
       setBurstOrigin(r ? {x:r.left+r.width/2, y:r.top+r.height/2} : null);
       setBurstKey(function(k){ return k+1; });
       setShowBurst(true);
+      SFX.play('perfect');
       toast.push({message:'يوم مثالي! أنجزت كل عاداتك اليوم', icon:'Sparkles', tone:'gold'});
     }, [pct]);
     var bk = useState(0); var burstKey = bk[0], setBurstKey = bk[1];
@@ -2048,7 +2129,7 @@
     var vs = useState(st.title); var val=vs[0], setVal=vs[1];
     var js = useState(false); var justDone=js[0], setJustDone=js[1];
     function handleToggle(){
-      if(!props.checked){ setJustDone(true); setTimeout(function(){ setJustDone(false); }, 350); }
+      if(!props.checked){ SFX.play('sub'); setJustDone(true); setTimeout(function(){ setJustDone(false); }, 350); }
       props.onToggle();
     }
     function commit(){
@@ -2108,7 +2189,7 @@
     var pp = useState(0); var popKey = pp[0], setPopKey = pp[1];
     var prevDone = useRef(isDone);
     useEffect(function(){
-      if(isDone && !prevDone.current){ setPopKey(function(k){ return k+1; }); setJustDone(true); setTimeout(function(){ setJustDone(false); }, 350); }
+      if(isDone && !prevDone.current){ SFX.play('habit'); setPopKey(function(k){ return k+1; }); setJustDone(true); setTimeout(function(){ setJustDone(false); }, 350); }
       prevDone.current = isDone;
     }, [isDone]);
     function handleToggleWhole(e){
@@ -3635,12 +3716,13 @@
       return function(){ if(completeTimer.current){ clearTimeout(completeTimer.current); completeTimer.current = null; } };
     }, []);
     useEffect(function(){
-      if(allSubsDone && !prevAllSubs.current && !prefersReducedMotion()) setRowPulse(function(k){ return k+1; });
+      if(allSubsDone && !prevAllSubs.current){ SFX.play('habit'); if(!prefersReducedMotion()) setRowPulse(function(k){ return k+1; }); }
       prevAllSubs.current = allSubsDone;
     }, [allSubsDone]);
     function handleComplete(){
       if(task.status==='done'){ props.onComplete(task.id); return; }
       if(completing) return;
+      SFX.play('task');
       if(prefersReducedMotion()){ props.onComplete(task.id); return; }
       setPopKey(function(k){ return k+1; });
       setJustDone(true); setTimeout(function(){ setJustDone(false); }, 350);
@@ -3650,6 +3732,7 @@
       completeTimer.current = setTimeout(function(){ completeTimer.current = null; complete(id); }, TASK_EXIT_DELAY + TASK_EXIT_MS + 6);
     }
     function handleToggleSub(st){
+      if(!st.done) SFX.play('sub');
       if(!prefersReducedMotion()){
         if(!st.done){ setSubPop({id:st.id, n:(subPop?subPop.n:0)+1}); setTimeout(function(){ setSubPop(null); }, 380); }
         setTick(function(k){ return k+1; });
@@ -4009,6 +4092,7 @@
       setBurstOrigin(r && r.width ? {x:r.left+r.width/2, y:r.top+r.height/2} : null);
       setBurstKey(function(k){ return k+1; });
       setShowBurst(true);
+      SFX.play('perfect');
       toast.push({message:'أنجزت كل المهام العاجلة!', icon:'Sparkles', tone:'gold'});
     }, [tstate.items]);
 
@@ -4042,6 +4126,7 @@
       } else if(dest==='done'){
         if(target.status==='done') return;
         lastAction.current = 'complete';
+        SFX.play('task');
         patchItem(id, function(){ return {status:'done', doneOn:todayKeyFn()}; });
         toast.push({message:'تم إكمال المهمة 🎉', icon:'CheckCircle2'});
       } else {
@@ -4233,7 +4318,7 @@
         list.map(function(x, i){
           var pal = PALETTE[x.tone], it = x.task;
           return h('div', {key:it.id, className:'tk-focus-row animate-fadeUp', style:stagger(i)},
-            h('button', {type:'button', onClick:function(){ props.onComplete(it.id); }, 'aria-label':'إكمال «'+it.title+'»', className:'tk-focus-check focus-ring'},
+            h('button', {type:'button', onClick:function(){ SFX.play('task'); props.onComplete(it.id); }, 'aria-label':'إكمال «'+it.title+'»', className:'tk-focus-check focus-ring'},
               h(Icon,{name:'Check', size:11, strokeWidth:3})),
             h('button', {type:'button', onClick:function(){ props.onEdit(it); }, className:'flex-1 min-w-0 text-right', title:'تعديل'},
               h('div', {className:'text-[12.5px] font-bold truncate'}, it.title),
