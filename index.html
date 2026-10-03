@@ -2162,6 +2162,7 @@
   function HabitRow(props){
     var habit = props.habit, entry = props.entry;
     var xs = useState(false); var expanded=xs[0], setExpanded=xs[1];
+    var toastApi = useToast();
     var js = useState(false); var justDone=js[0], setJustDone=js[1];
     var ns = useState(''); var newSub=ns[0], setNewSub=ns[1];
     var pal = PALETTE[habit.color] || PALETTE.sky;
@@ -2194,6 +2195,12 @@
     }, [isDone]);
     function handleToggleWhole(e){
       e.stopPropagation();
+      /* إكمال جزئي: لا نُكمل الباقي تلقائيًا، نفتح المهام الفرعية لتأكيدها بنفسك */
+      if(hasSubs && !isDone && doneCount>0 && doneCount<liveCount){
+        setExpanded(true);
+        toastApi.push({message:'باقي '+(liveCount-doneCount)+' من المهام الفرعية — أكملها لتتم العادة', icon:'ListChecks'});
+        return;
+      }
       props.onToggleWhole(habit.id);
     }
     function submitSubtask(e){
