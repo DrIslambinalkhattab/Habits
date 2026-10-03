@@ -525,7 +525,7 @@
    كل تغيير يُسجَّل كسطر جديد في athar_events (لا تعديل ولا حذف)، وآخر حالة تُحسب من السجلات.
    املأ SB_URL و SB_KEY من Supabase → Settings → API (anon public key). لو تُركتا فارغتين يعمل الموقع محليًا كما كان. */
 (function(){
-  var SB_URL='', SB_KEY='';   /* مثال: 'https://xxxx.supabase.co' و 'eyJhbGciOi...' (anon public key) */
+  var SB_URL='https://xgjkmbcvyxxlqxnckhhi.supabase.co', SB_KEY='sb_publishable_j-Jkn57NUHt9N1Gr_uUiMg_e03BOga3';   /* مثال: 'https://xxxx.supabase.co' و 'eyJhbGciOi...' (anon public key) */
 
   var cloud=!!(SB_URL&&SB_KEY), SESSKEY='athar.auth.v1', BASE=SB_URL.replace(/\/+$/,'');
   var SKIP={}; SKIP[SESSKEY]=1;
@@ -592,7 +592,7 @@
   function loadSess(){ try{ return JSON.parse(ls.getItem(SESSKEY)||'null'); }catch(e){ return null; } }
   function saveSess(r){ var o={access_token:r.access_token, refresh_token:r.refresh_token, expires_at:r.expires_at||(now()+(r.expires_in||3600)), email:(r.user&&r.user.email)||(sess&&sess.email)||'', uid:uidOf(r.access_token)}; sess=o; _set.call(ls,SESSKEY,JSON.stringify(o)); return o; }
   function clearSess(){ sess=null; _rem.call(ls,SESSKEY); }
-  function authHeaders(tok){ return {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+(tok||SB_KEY)}; }
+  function authHeaders(tok){ var h={'Content-Type':'application/json','apikey':SB_KEY}; if(tok) h['Authorization']='Bearer '+tok; else if(SB_KEY.indexOf('eyJ')===0) h['Authorization']='Bearer '+SB_KEY; return h; }
   function refreshSync(){ /* يرجع: true نجاح، false رفض (انتهت الجلسة)، null تعذّر الاتصال */
     try{
       var x=new XMLHttpRequest(); x.open('POST',BASE+'/auth/v1/token?grant_type=refresh_token',false);
