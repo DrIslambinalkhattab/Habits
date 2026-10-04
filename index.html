@@ -435,6 +435,27 @@
   @keyframes viewIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
   .view-enter { animation: viewIn .22s cubic-bezier(.2,.8,.2,1) both; }
   @media (prefers-reduced-motion: reduce) { .view-enter { animation: none !important; } }
+  /* ===== History tab (hr-*) ===== */
+  .hr-card{border:1px solid var(--color-line);background:linear-gradient(180deg,var(--color-surface),var(--color-raised));border-radius:22px;box-shadow:0 1px 2px rgba(22,33,44,.03),0 10px 26px -16px rgba(22,33,44,.18)}
+  .hr-day{position:relative;aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:800;border:1px solid transparent;background:var(--color-linesoft);color:var(--color-inksoft);cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+  .hr-day:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 18px -10px rgba(22,33,44,.35)}
+  .hr-day:disabled{opacity:.3;cursor:default;background:transparent}
+  .hr-day.today{border-color:var(--color-brand)}
+  .hr-day.sel{outline:2px solid var(--color-ink);outline-offset:2px}
+  .hr-day i{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.75}
+  .hr-ring{animation:hrRing .9s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes hrRing{from{stroke-dashoffset:var(--c)}}
+  .hr-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:16px;border:1px solid var(--color-line);background:var(--color-surface);transition:border-color .2s,box-shadow .25s,transform .25s}
+  button.hr-row{width:100%;text-align:right;cursor:pointer}
+  button.hr-row:hover{border-color:var(--color-brand-line);box-shadow:0 10px 22px -16px rgba(22,33,44,.35);transform:translateY(-1px)}
+  .hr-pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:11.5px;font-weight:800;white-space:nowrap}
+  .hr-bar{height:6px;border-radius:99px;background:var(--color-linesoft);overflow:hidden}
+  .hr-bar b{display:block;height:100%;border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  .hr-nav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--color-inksoft);transition:background .2s,color .2s,opacity .2s}
+  .hr-nav:hover:not(:disabled){background:var(--color-linesoft);color:var(--color-ink)}
+  .hr-nav:disabled{opacity:.3;cursor:default}
+  @media (prefers-reduced-motion: reduce){ .hr-ring{animation:none} }
+
   /* Command palette */
   @keyframes cmdIn { from { opacity:0; transform:translateY(-8px) scale(.985); } to { opacity:1; transform:none; } }
   .cmd-panel { animation: cmdIn .2s cubic-bezier(.2,.8,.2,1) both; }
@@ -974,6 +995,8 @@
     Rose: [['path', {d:'M12.00 9.60 C6.90 8.55 8.26 3.80 12.00 2.60 C15.74 3.80 17.10 8.55 12.00 9.60 z'}], ['path', {d:'M14.08 10.80 C12.44 5.86 17.23 4.66 20.14 7.30 C20.97 11.14 17.54 14.69 14.08 10.80 z'}], ['path', {d:'M14.08 13.20 C17.54 9.31 20.97 12.86 20.14 16.70 C17.23 19.34 12.44 18.14 14.08 13.20 z'}], ['path', {d:'M12.00 14.40 C17.10 15.45 15.74 20.20 12.00 21.40 C8.26 20.20 6.90 15.45 12.00 14.40 z'}], ['path', {d:'M9.92 13.20 C11.56 18.14 6.77 19.34 3.86 16.70 C3.03 12.86 6.46 9.31 9.92 13.20 z'}], ['path', {d:'M9.92 10.80 C6.46 14.69 3.03 11.14 3.86 7.30 C6.77 4.66 11.56 5.86 9.92 10.80 z'}], ['circle', {cx:'12',cy:'12',r:'1.6'}]]
   };
 
+  ICONS.ChevronLeft = [['polyline',{points:'15 18 9 12 15 6'}]];
+  ICONS.ChevronRight = [['polyline',{points:'9 18 15 12 9 6'}]];
   function Icon(props){
     var name = props.name, size = props.size || 18, sw = props.strokeWidth || 1.8,
         cls = props.className || '', filled = props.filled;
@@ -1750,7 +1773,7 @@
         h('div', {className:'flex items-center gap-2.5 shrink-0 justify-self-start'},
           h('div', {className:'w-9 h-9 rounded-[10px] flex items-center justify-center text-white shrink-0 shadow-[0_2px_6px_-1px_rgba(46,110,147,0.5)]', style:{background:'var(--grad-brand)'}}, h(Icon,{name:'Target', size:16, strokeWidth:2})),
           h('span', {className:'hidden sm:inline text-[17px] font-extrabold tracking-tightish'}, 'أثر')),
-        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'}], value:props.view, onChange:props.setView})),
+        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'},{key:'history',label:'السجل'}], value:props.view, onChange:props.setView})),
         h('div', {className:'flex items-center gap-2 shrink-0 justify-self-end'},
           h('button', {onClick:function(){ setSfxOn(SFX.toggle()); }, 'aria-label':sfxOn?'كتم أصوات الإنجاز':'تشغيل أصوات الإنجاز', 'aria-pressed':sfxOn, title:sfxOn?'الصوت: مفعّل':'الصوت: مكتوم',
             className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
@@ -4513,6 +4536,212 @@
           }}))));
   }
 
+  /* ================= HISTORY VIEW (السجل) ================= */
+  var HR_WD = ['سبت','أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة'];
+  function hrTone(r){ return r===null ? 'slate' : r>=1 ? 'green' : r>=0.6 ? 'sky' : r>=0.3 ? 'amber' : 'rose'; }
+  function hrDay(habits, progress, tasks, key){
+    var rows = habitsLiveOn(habits, key).map(function(hb){
+      var en = progress[key] && progress[key][hb.id], subs = activeSubsOn(hb, key);
+      return {habit:hb, done:isHabitDoneOnDate(hb, en, key), subs:subs,
+        subDone:subs.filter(function(s){ return en && en.subDone && en.subDone.indexOf(s.id)>-1; }).map(function(s){ return s.id; })};
+    });
+    var paused = habits.filter(function(hb){ return (!hb.createdAt || hb.createdAt<=key) && isHabitPausedOn(hb, key); });
+    var done = rows.filter(function(r){ return r.done; }).length;
+    return {key:key, rows:rows, paused:paused, done:done, total:rows.length, rate: rows.length ? done/rows.length : null,
+      tasks:tasks.filter(function(t){ return t.status==='done' && t.doneOn===key; })};
+  }
+  function HistoryView(props){
+    var habits = props.habits, progress = props.progress, tasks = props.tasks || [], today = todayKeyFn();
+    var s1 = useState(function(){ return addDays(today,-1); }); var sel = s1[0], setSel = s1[1];
+    var s2 = useState(function(){ var d=new Date(); d.setDate(d.getDate()-1); return {y:d.getFullYear(), m:d.getMonth()}; }); var mo = s2[0], setMo = s2[1];
+    var s3 = useState('all'); var flt = s3[0], setFlt = s3[1];
+    var s4 = useState(''); var q = s4[0], setQ = s4[1];
+    var s5 = useState({}); var open = s5[0], setOpen = s5[1];
+    var s6 = useState(10); var more = s6[0], setMore = s6[1];
+    var topRef = useRef(null);
+    var earliest = useMemo(function(){
+      var e = today;
+      habits.forEach(function(hb){ if(hb.createdAt && hb.createdAt<e) e = hb.createdAt; });
+      tasks.forEach(function(t){ if(t.doneOn && t.doneOn<e) e = t.doneOn; });
+      Object.keys(progress).forEach(function(k){ if(k<e) e = k; });
+      return e;
+    }, [habits, progress, tasks]);
+    var cal = useMemo(function(){
+      var first = new Date(mo.y, mo.m, 1), lead = (first.getDay()+1)%7, n = new Date(mo.y, mo.m+1, 0).getDate();
+      var cells = [], i, sum = 0, cnt = 0, perfect = 0, run = 0, best = 0, tk = 0;
+      for(i=0;i<lead;i++) cells.push(null);
+      for(i=1;i<=n;i++){
+        var key = mo.y+'-'+pad2(mo.m+1)+'-'+pad2(i), fut = key>today, d = fut ? null : hrDay(habits, progress, tasks, key);
+        if(d){
+          if(d.total){ sum += d.rate; cnt++; if(d.done===d.total){ perfect++; run++; if(run>best) best = run; } else run = 0; }
+          tk += d.tasks.length;
+        }
+        cells.push({key:key, n:i, fut:fut, d:d});
+      }
+      return {cells:cells, avg:cnt ? Math.round(sum/cnt*100) : null, perfect:perfect, best:best, tk:tk, tracked:cnt};
+    }, [habits, progress, tasks, mo, today]);
+    var day = useMemo(function(){ return hrDay(habits, progress, tasks, sel); }, [habits, progress, tasks, sel]);
+    var tl = useMemo(function(){
+      var out = [], k = today, g = 0;
+      while(out.length<more && k>=earliest && g<1500){ var d = hrDay(habits, progress, tasks, k); if(d.total || d.tasks.length) out.push(d); k = addDays(k,-1); g++; }
+      return {days:out, end:k<earliest};
+    }, [habits, progress, tasks, more, earliest, today]);
+
+    var rate = day.rate===null ? 0 : day.rate, tone = hrTone(day.rate), C = 2*Math.PI*34;
+    var pct = useCountUp(Math.round(rate*100), 700);
+    var diff = Math.round((new Date(today+'T00:00:00') - new Date(sel+'T00:00:00'))/864e5);
+    var rel = diff===0 ? 'اليوم' : diff===1 ? 'أمس' : diff===2 ? 'أول أمس' : 'قبل '+arNum(diff)+' يوم';
+    var eD = new Date(earliest+'T00:00:00'), nD = new Date();
+    var atMin = mo.y*12+mo.m <= eD.getFullYear()*12+eD.getMonth(), atMax = mo.y*12+mo.m >= nD.getFullYear()*12+nD.getMonth();
+    function shift(dm){ var t = mo.y*12+mo.m+dm; setMo({y:Math.floor(t/12), m:t%12}); }
+    function pick(key, scroll){
+      setSel(key); var d = new Date(key+'T00:00:00'); setMo({y:d.getFullYear(), m:d.getMonth()});
+      if(scroll && topRef.current && topRef.current.scrollIntoView) topRef.current.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    function stat(icon, tone, label, val, note, i){
+      var p = PALETTE[tone];
+      return h('div', {className:'hr-card p-4 animate-fadeUp', style:{animationDelay:(i*50)+'ms'}},
+        h('div', {className:'flex items-center justify-between'},
+          h('span', {className:'text-[12px] font-bold text-inksoft'}, label),
+          h('span', {className:'w-8 h-8 rounded-[10px] flex items-center justify-center', style:{background:p.tint, color:p.text}}, h(Icon, {name:icon, size:15}))),
+        h('div', {className:'num text-[26px] font-extrabold mt-2 leading-none'}, val),
+        h('div', {className:'text-[11.5px] font-bold text-inkfaint mt-1.5'}, note));
+    }
+    function pill(ok){
+      var p = PALETTE[ok ? 'green' : 'rose'];
+      return h('span', {className:'hr-pill', style:{background:p.tint, color:p.text}}, h(Icon, {name: ok ? 'Check' : 'Minus', size:12, strokeWidth:2.6}), ok ? 'تمّت' : 'فاتت');
+    }
+    var rows = day.rows.filter(function(r){
+      if(flt==='done' && !r.done) return false;
+      if(flt==='missed' && r.done) return false;
+      return !q.trim() || r.habit.name.indexOf(q.trim())>-1;
+    });
+    function habitRow(r, i){
+      var hb = r.habit, pal = PALETTE[hb.color] || PALETTE.sky, ic = HABIT_ICONS.indexOf(hb.icon)!==-1 ? hb.icon : 'Target';
+      var cat = (props.categories || []).filter(function(c){ return c.id===hb.categoryId; })[0], hasSubs = r.subs.length>0, isOpen = !!open[hb.id];
+      var head = h('div', {className:'flex items-center gap-3 w-full min-w-0'},
+        h('span', {className:'w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0', style:{background:pal.tint, color:pal.text}}, h(Icon, {name:ic, size:18})),
+        h('div', {className:'min-w-0 flex-1'},
+          h('div', {className:'text-[14px] font-extrabold truncate'}, hb.name),
+          h('div', {className:'flex items-center gap-2 mt-1 text-[11.5px] font-bold text-inkfaint'},
+            cat ? h('span', {className:'truncate'}, cat.name) : null,
+            hasSubs ? h('span', {className:'num'}, arNum(r.subDone.length)+' / '+arNum(r.subs.length)+' مهام فرعية') : null),
+          hasSubs ? h('div', {className:'hr-bar mt-2 max-w-[220px]'}, h('b', {style:{width:(r.subDone.length/r.subs.length*100)+'%', background:pal.dot}})) : null),
+        pill(r.done),
+        hasSubs ? h(Icon, {name:'ChevronDown', size:15, className:'text-inkfaint transition-transform '+(isOpen?'rotate-180':'')}) : null);
+      return h('div', {key:hb.id, className:'animate-fadeUp', style:{animationDelay:Math.min(i,10)*30+'ms'}},
+        hasSubs ? h('button', {type:'button', className:'hr-row focus-ring', 'aria-expanded':isOpen, onClick:function(){ setOpen(function(p){ var n = Object.assign({}, p); n[hb.id] = !n[hb.id]; return n; }); }}, head)
+                : h('div', {className:'hr-row'}, head),
+        hasSubs && isOpen ? h('div', {className:'mt-1.5 mr-6 pr-4 border-r-2 space-y-1.5', style:{borderColor:pal.line}},
+          r.subs.map(function(s){
+            var ok = r.subDone.indexOf(s.id)>-1;
+            return h('div', {key:s.id, className:'flex items-center gap-2.5 text-[12.5px] font-bold py-1 '+(ok?'text-ink':'text-inkfaint')},
+              h('span', {className:'w-5 h-5 rounded-full flex items-center justify-center shrink-0', style:{background: ok ? pal.dot : 'var(--color-linesoft)', color: ok ? '#fff' : 'var(--color-inkfaint)'}}, h(Icon, {name: ok ? 'Check' : 'Minus', size:11, strokeWidth:2.8})),
+              h('span', {className: ok ? '' : 'line-through decoration-1'}, s.title));
+          })) : null);
+    }
+    function taskRow(t, i){
+      var pal = PALETTE[t.color] || PALETTE.sky, g = (props.taskGroups || []).filter(function(x){ return x.id===t.groupId; })[0], subs = t.subtasks || [];
+      return h('div', {key:t.id, className:'hr-row animate-fadeUp', style:{animationDelay:Math.min(i,10)*30+'ms'}},
+        h('span', {className:'w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0', style:{background:pal.tint, color:pal.text}}, h(Icon, {name:'CheckCircle2', size:18})),
+        h('div', {className:'min-w-0 flex-1'},
+          h('div', {className:'text-[14px] font-extrabold truncate'}, t.title),
+          h('div', {className:'text-[11.5px] font-bold text-inkfaint mt-1 flex gap-2'}, g ? h('span', null, g.name) : null, subs.length ? h('span', {className:'num'}, arNum(subs.filter(function(x){return x.done;}).length)+' / '+arNum(subs.length)+' فرعية') : null)),
+        h('span', {className:'hr-pill', style:{background:PALETTE.green.tint, color:PALETTE.green.text}}, h(Icon, {name:'Check', size:12, strokeWidth:2.6}), 'منجزة'));
+    }
+    function subHead(icon, title, n){
+      return h('div', {className:'flex items-center gap-2 mb-3 mt-1'}, h(Icon, {name:icon, size:14, className:'text-inkfaint'}), h('h4', {className:'text-[13.5px] font-extrabold'}, title), h('span', {className:'num text-[11.5px] font-bold text-inkfaint'}, arNum(n)));
+    }
+    var empty = !day.total && !day.tasks.length;
+
+    return h('div', {className:'space-y-6 pb-16'},
+      h('div', null,
+        h('h2', {className:'text-[22px] font-extrabold tracking-tightish leading-tight'}, 'السجل'),
+        h('p', {className:'text-[12.5px] font-bold text-inkfaint mt-1'}, 'تصفّح أيامك السابقة وما أنجزته في كل يوم من عادات ومهام')),
+      h('div', {className:'grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4'},
+        stat('BarChart3', 'sky', 'متوسط الإنجاز', cal.avg===null ? '—' : arNum(cal.avg)+'٪', ARABIC_MONTHS[mo.m]+' '+arNum(mo.y), 0),
+        stat('Award', 'violet', 'أيام مكتملة', arNum(cal.perfect), 'من '+arNum(cal.tracked)+' يومًا مسجّلًا', 1),
+        stat('Flame', 'amber', 'أطول سلسلة', arNum(cal.best)+' يوم', 'أيام مكتملة متتالية', 2),
+        stat('CheckCircle2', 'green', 'مهام منجزة', arNum(cal.tk), 'خلال الشهر', 3)),
+      h('div', {className:'grid lg:grid-cols-[372px_minmax(0,1fr)] gap-5 items-start'},
+        /* calendar */
+        h('div', {className:'hr-card p-5 lg:sticky lg:top-[88px]'},
+          h('div', {className:'flex items-center justify-between mb-4'},
+            h('button', {type:'button', className:'hr-nav focus-ring', disabled:atMin, onClick:function(){ shift(-1); }, 'aria-label':'الشهر السابق'}, h(Icon, {name:'ChevronRight', size:17})),
+            h('div', {className:'text-center'}, h('div', {className:'text-[16px] font-extrabold'}, ARABIC_MONTHS[mo.m]), h('div', {className:'num text-[11.5px] font-bold text-inkfaint'}, arNum(mo.y))),
+            h('button', {type:'button', className:'hr-nav focus-ring', disabled:atMax, onClick:function(){ shift(1); }, 'aria-label':'الشهر التالي'}, h(Icon, {name:'ChevronLeft', size:17}))),
+          h('div', {key:mo.y+'-'+mo.m, className:'animate-fadeUp'},
+            h('div', {className:'grid grid-cols-7 gap-1.5 mb-1.5'}, HR_WD.map(function(w){ return h('div', {key:w, className:'text-center text-[10.5px] font-bold text-inkfaint'}, w); })),
+            h('div', {className:'grid grid-cols-7 gap-1.5'}, cal.cells.map(function(c, i){
+              if(!c) return h('div', {key:'e'+i});
+              var d = c.d, bg = null;
+              if(d && d.total) bg = 'color-mix(in srgb, var(--pal-'+hrTone(d.rate)+'-dot) '+Math.round(14+d.rate*46)+'%, var(--color-surface))';
+              return h('button', {key:c.key, type:'button', disabled:c.fut, onClick:function(){ pick(c.key); }, 'aria-pressed':c.key===sel,
+                'aria-label':fmtShortDate(c.key)+(d && d.total ? ' — '+arNum(d.done)+' من '+arNum(d.total) : ''),
+                className:'hr-day focus-ring'+(c.key===today?' today':'')+(c.key===sel?' sel':''), style: bg ? {background:bg, color:'var(--color-ink)'} : null},
+                h('span', {className:'num'}, arNum(c.n)), d && d.tasks.length ? h('i') : null);
+            }))),
+          h('div', {className:'flex items-center justify-between mt-4 pt-4 border-t border-line text-[11px] font-bold text-inkfaint'},
+            h('div', {className:'flex items-center gap-1.5'}, 'أقل', [14,26,38,50,60].map(function(p){ return h('span', {key:p, className:'w-3.5 h-3.5 rounded-[4px]', style:{background:'color-mix(in srgb, var(--pal-green-dot) '+p+'%, var(--color-surface))'}}); }), 'أكثر'),
+            h('span', {className:'flex items-center gap-1.5'}, h('i', {className:'w-1 h-1 rounded-full bg-inksoft inline-block'}), 'مهام منجزة'))),
+        /* detail + timeline */
+        h('div', {className:'space-y-5 min-w-0'},
+          h('div', {ref:topRef, className:'hr-card p-5 md:p-6 scroll-mt-[88px]'},
+            h('div', {key:sel, className:'flex flex-wrap items-center gap-5 animate-fadeUp'},
+              h('div', {className:'relative w-[88px] h-[88px] shrink-0'},
+                h('svg', {width:88, height:88, viewBox:'0 0 88 88', 'aria-hidden':true},
+                  h('circle', {cx:44, cy:44, r:34, fill:'none', stroke:'var(--color-linesoft)', strokeWidth:8}),
+                  h('circle', {className:'hr-ring', cx:44, cy:44, r:34, fill:'none', stroke:'var(--pal-'+(tone==='slate'?'sky':tone)+'-dot)', strokeWidth:8, strokeLinecap:'round', transform:'rotate(-90 44 44)', style:{'--c':C, strokeDasharray:C, strokeDashoffset:C*(1-rate)}})),
+                h('div', {className:'absolute inset-0 flex items-center justify-center num text-[19px] font-extrabold'}, arNum(pct)+'٪')),
+              h('div', {className:'min-w-0 flex-1'},
+                h('div', {className:'text-[11.5px] font-bold text-inkfaint'}, rel),
+                h('h3', {className:'text-[20px] font-extrabold tracking-tightish leading-tight mt-0.5'}, fmtShortDate(sel)),
+                h('div', {className:'flex flex-wrap gap-2 mt-2.5'},
+                  h('span', {className:'hr-pill', style:{background:PALETTE.sky.tint, color:PALETTE.sky.text}}, h(Icon, {name:'Target', size:12}), arNum(day.done)+' من '+arNum(day.total)+' عادة'),
+                  h('span', {className:'hr-pill', style:{background:PALETTE.green.tint, color:PALETTE.green.text}}, h(Icon, {name:'CheckCircle2', size:12}), arNum(day.tasks.length)+' مهمة منجزة'),
+                  day.total && day.done===day.total ? h('span', {className:'hr-pill', style:{background:PALETTE.amber.tint, color:PALETTE.amber.text}}, h(Icon, {name:'Award', size:12}), 'يوم مكتمل') : null)),
+              h('div', {className:'flex items-center gap-1'},
+                h('button', {type:'button', className:'hr-nav focus-ring', disabled:sel<=earliest, onClick:function(){ pick(addDays(sel,-1)); }, 'aria-label':'اليوم السابق'}, h(Icon, {name:'ChevronRight', size:17})),
+                h('button', {type:'button', className:'hr-nav focus-ring', disabled:sel>=today, onClick:function(){ pick(addDays(sel,1)); }, 'aria-label':'اليوم التالي'}, h(Icon, {name:'ChevronLeft', size:17})))),
+            empty ? h('div', {className:'text-center py-12'},
+                h('div', {className:'w-12 h-12 mx-auto rounded-2xl flex items-center justify-center bg-linesoft text-inkfaint'}, h(Icon, {name:'Calendar', size:20})),
+                h('p', {className:'text-[13.5px] font-extrabold mt-3'}, 'لا توجد بيانات لهذا اليوم'),
+                h('p', {className:'text-[12px] font-bold text-inkfaint mt-1'}, 'اختر يومًا آخر من التقويم أو من القائمة أدناه'))
+              : h('div', {className:'mt-6 pt-5 border-t border-line'},
+                day.total ? h(Fragment, null,
+                  h('div', {className:'flex flex-wrap items-center justify-between gap-3 mb-4'},
+                    subHead('ListChecks', 'العادات', rows.length),
+                    h('div', {className:'flex items-center gap-2 flex-wrap'},
+                      h('div', {className:'relative'},
+                        h(Icon, {name:'Search', size:14, className:'absolute right-3 top-[11px] text-inkfaint pointer-events-none'}),
+                        h('input', {value:q, onChange:function(e){ setQ(e.target.value); }, placeholder:'ابحث في العادات…', 'aria-label':'بحث في عادات اليوم',
+                          className:'h-9 w-full sm:w-48 rounded-full bg-linesoft border border-transparent focus:bg-surface focus:border-brand-line pr-9 pl-3 text-[12.5px] font-bold outline-none transition-smooth'})),
+                      h(SegmentedControl, {options:[{key:'all',label:'الكل'},{key:'done',label:'تمّت'},{key:'missed',label:'فاتت'}], value:flt, onChange:setFlt}))),
+                  h('div', {className:'space-y-2'}, rows.length ? rows.map(habitRow) : h('p', {className:'text-[12.5px] font-bold text-inkfaint text-center py-6'}, 'لا توجد عادات مطابقة.')),
+                  day.paused.length && flt==='all' && !q.trim() ? h('p', {className:'text-[11.5px] font-bold text-inkfaint mt-3 flex items-center gap-1.5'}, h(Icon, {name:'Pause', size:12}), 'متوقفة مؤقتًا: '+day.paused.map(function(x){ return x.name; }).join('، ')) : null) : null,
+                day.tasks.length ? h('div', {className: day.total ? 'mt-7' : ''}, subHead('CheckCircle2', 'المهام المنجزة', day.tasks.length), h('div', {className:'space-y-2'}, day.tasks.map(taskRow))) : null)),
+          /* timeline */
+          h('div', {className:'hr-card p-5 md:p-6'},
+            h(SectionHead, {icon:'Clock', title:'الأيام السابقة', sub:'اضغط على أي يوم لعرض تفاصيله'}),
+            h('div', {className:'space-y-2'}, tl.days.map(function(d, i){
+              var dt = new Date(d.key+'T00:00:00'), t = hrTone(d.rate), on = d.key===sel;
+              return h('button', {key:d.key, type:'button', onClick:function(){ pick(d.key, true); }, 'aria-pressed':on, className:'hr-row focus-ring animate-fadeUp', style:{animationDelay:Math.min(i,10)*25+'ms', borderColor: on ? 'var(--color-ink)' : null}},
+                h('div', {className:'w-12 text-center shrink-0'}, h('div', {className:'num text-[19px] font-extrabold leading-none'}, arNum(dt.getDate())), h('div', {className:'text-[10.5px] font-bold text-inkfaint mt-1'}, ARABIC_DAYS[dt.getDay()])),
+                h('div', {className:'min-w-0 flex-1'},
+                  h('div', {className:'flex items-center justify-between gap-2 text-[12.5px] font-extrabold'},
+                    h('span', {className:'num'}, d.total ? arNum(d.done)+' / '+arNum(d.total)+' عادة' : 'بدون عادات'),
+                    d.tasks.length ? h('span', {className:'text-[11.5px] font-bold', style:{color:PALETTE.green.text}}, arNum(d.tasks.length)+' مهمة') : null),
+                  h('div', {className:'hr-bar mt-2'}, h('b', {style:{width:(d.rate===null?0:d.rate*100)+'%', background:'var(--pal-'+(t==='slate'?'sky':t)+'-dot)'}})),
+                  h('div', {className:'flex gap-1 mt-2 flex-wrap'}, d.rows.slice(0,12).map(function(r){
+                    var pal = PALETTE[r.habit.color] || PALETTE.sky;
+                    return h('span', {key:r.habit.id, title:r.habit.name, className:'w-2.5 h-2.5 rounded-full', style:{background: r.done ? pal.dot : 'transparent', boxShadow: r.done ? 'none' : 'inset 0 0 0 1.5px var(--color-line)'}});
+                  }))),
+                h('span', {className:'num text-[13px] font-extrabold w-10 text-left shrink-0', style:{color:'var(--pal-'+(t==='slate'?'sky':t)+'-text)'}}, d.rate===null ? '' : arNum(Math.round(d.rate*100))+'٪'));
+            })),
+            !tl.days.length ? h('p', {className:'text-[12.5px] font-bold text-inkfaint text-center py-8'}, 'لا يوجد سجل بعد. ابدأ بتتبع عاداتك وسيظهر هنا.') : null,
+            !tl.end ? h('button', {type:'button', onClick:function(){ setMore(more+10); }, className:'mt-4 w-full h-10 rounded-full border border-line text-[12.5px] font-extrabold text-inksoft hover:bg-linesoft hover:text-ink transition-smooth focus-ring'}, 'عرض المزيد') : null))));
+  }
+
   function AppInner(){
     var s = useState(loadState()); var state=s[0], setState=s[1];
     var vs = useState('today'); var view=vs[0], setView=vs[1];
@@ -4885,6 +5114,7 @@
     var paletteCommands = [
       {id:'nav-today', group:'nav', label:'اليوم', icon:'CalendarDays', kbd:['1'], keywords:'home today الرئيسية', run:function(){ setView('today'); }},
       {id:'nav-overview', group:'nav', label:'نظرة عامة', icon:'BarChart3', kbd:['2'], keywords:'الإحصائيات overview stats', run:function(){ setView('overview'); }},
+      {id:'nav-history', group:'nav', label:'السجل', icon:'Clock', kbd:['4'], keywords:'history log سجل الأيام السابقة', run:function(){ setView('history'); }},
       {id:'nav-tasks', group:'nav', label:'تبويب المهام', icon:'ListChecks', kbd:['3'], keywords:'tasks urgent العاجلة المهام', run:goTasks},
       {id:'act-habit', group:'act', label:'عادة جديدة', icon:'Plus', kbd:['N'], keywords:'add new habit إضافة', run:function(){ setModalHabit({}); }},
       {id:'act-task', group:'act', label:'مهمة جديدة', icon:'Zap', kbd:['T'], keywords:'add new task إضافة', run:function(){ tasksModule.openEditor(); }},
@@ -4921,6 +5151,7 @@
         else if(k==='t' || k==='T' || k==='ف'){ e.preventDefault(); kbdRef.current.tasksModule.openEditor(); }
         else if(k==='1'){ e.preventDefault(); setView('today'); }
         else if(k==='2'){ e.preventDefault(); setView('overview'); }
+        else if(k==='4'){ e.preventDefault(); setView('history'); }
         else if(k==='3'){ e.preventDefault(); goTasksRef.current(); }
         else if(k==='d' || k==='D' || k==='ي'){ e.preventDefault(); toggleThemeRef.current(); }
         else if(k==='?' || k==='؟'){ e.preventDefault(); setShowShortcuts(true); }
@@ -4955,7 +5186,8 @@
                 onAdd:function(presetId, kind){ setModalHabit(presetId ? (kind==='period' ? {periodId:presetId} : kind==='priority' ? {priorityId:presetId} : {categoryId:presetId}) : {}); }
               })) : null,
             view==='tasks' ? h(TasksView, tasksModule.shared) : null,
-            view==='overview' ? h(OverviewView, {habits:state.habits, progress:state.progress, categories:state.categories, periods:state.periods, priorities:state.priorities, onAdd:function(){ setModalHabit({}); }}) : null),
+            view==='overview' ? h(OverviewView, {habits:state.habits, progress:state.progress, categories:state.categories, periods:state.periods, priorities:state.priorities, onAdd:function(){ setModalHabit({}); }}) : null,
+            view==='history' ? h(HistoryView, {habits:state.habits, progress:state.progress, categories:state.categories, tasks:tasksModule.items, taskGroups:tasksModule.categories}) : null),
           view==='today' ? tasksModule.sidebarArchive : null),
         h('button', {onClick:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, className:'md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white shadow-raised active:scale-95 transition-smooth'},
           h(Icon,{name:'Plus', size:16, strokeWidth:2.4}), h('span',{className:'text-[13.5px] font-bold'}, view==='tasks' ? 'مهمة جديدة' : 'عادة جديدة'))),
