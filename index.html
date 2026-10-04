@@ -588,7 +588,40 @@
   @keyframes adWave{0%,100%{height:4px}50%{height:16px}}
   .ad-tick{display:inline-block;animation:adTick .32s cubic-bezier(.2,.8,.2,1) both}
   @keyframes adTick{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion: reduce){ .ad-wave.on i,.ad-tick{animation:none} .ad-sw,.ad-sw::after{transition:none} }
+
+  /* ===== الأذان والتذكيرات · طبقة التحسين (Premium) ===== */
+  .ad-sw{box-shadow:inset 0 1px 2px rgba(22,33,44,.14)}
+  .ad-sw[aria-checked=true]{background:var(--grad-brand)}
+  .ad-card{transition:border-color .3s,box-shadow .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+  .ad-card.ad-lift:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(22,33,44,.04),0 18px 34px -20px rgba(22,33,44,.28)}
+  .ad-card.is-next,.ad-card.is-on{border-color:var(--color-brand-line);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-brand) 9%,transparent),0 16px 32px -20px rgba(46,110,147,.45)}
+  .ad-row{border-radius:18px;transition:background .3s,border-color .3s}
+  .ad-row.on{background:color-mix(in srgb,var(--color-brand-tint) 55%,var(--color-linesoft));border-color:var(--color-brand-line)}
+  .ad-ico{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-inksoft);transition:all .3s}
+  .ad-row.on .ad-ico{background:var(--color-brand-tint);border-color:var(--color-brand-line);color:var(--color-brand-deep)}
+  .ad-sec-h{display:flex;align-items:center;gap:10px}
+  .ad-sec-ico{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--color-brand-tint);color:var(--color-brand-deep);border:1px solid var(--color-brand-line)}
+  .ad-pill{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:999px;font-size:10.5px;font-weight:800;background:var(--color-linesoft);color:var(--color-inkfaint);border:1px solid var(--color-line);white-space:nowrap}
+  .ad-pill.on{background:var(--color-brand-tint);color:var(--color-brand-deep);border-color:var(--color-brand-line)}
+  .ad-pill.next{background:var(--grad-brand);color:#fff;border-color:transparent;box-shadow:0 6px 14px -8px rgba(46,110,147,.7)}
+  .ad-pill.warn{background:var(--pal-amber-tint);color:var(--pal-amber-text);border-color:var(--pal-amber-line)}
+  .ad-hero{position:relative;overflow:hidden;border-radius:26px;padding:22px 22px 18px;color:#fff;background:linear-gradient(135deg,#2E6E93 0%,#215476 52%,#183B52 100%);box-shadow:0 1px 2px rgba(22,33,44,.1),0 26px 46px -26px rgba(31,78,107,.75)}
+  .ad-hero::before{content:'';position:absolute;inset-inline-end:-70px;top:-90px;width:260px;height:260px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.22),transparent 72%);pointer-events:none}
+  .ad-hero::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:radial-gradient(#fff 1px,transparent 1.3px);background-size:16px 16px;-webkit-mask-image:linear-gradient(to left,#000,transparent 65%);mask-image:linear-gradient(to left,#000,transparent 65%)}
+  .ad-hero-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.72)}
+  .ad-hero-time{font-size:38px;line-height:1;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .ad-hero-time.sm{font-size:22px;line-height:1.2}
+  .ad-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:18px}
+  .ad-strip>div{border-radius:14px;padding:9px 4px;text-align:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.10);transition:all .3s cubic-bezier(.2,.8,.2,1)}
+  .ad-strip>div.is-next{background:rgba(255,255,255,.96);color:#1F4E6B;border-color:transparent;box-shadow:0 10px 20px -12px rgba(0,0,0,.55);transform:translateY(-2px)}
+  .ad-strip>div.is-past{opacity:.5}
+  .ad-time{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--color-line);background:var(--color-surface);color:var(--color-ink);font:inherit;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;direction:ltr;transition:border-color .2s,box-shadow .2s}
+  .ad-time:focus{outline:none;border-color:var(--color-brand);box-shadow:0 0 0 3px var(--color-brand-tint)}
+  .ad-day{height:34px;padding:0 12px;border-radius:11px;border:1px solid var(--color-line);background:var(--color-surface);font-size:12px;font-weight:800;color:var(--color-inkfaint);transition:all .25s cubic-bezier(.2,.8,.2,1)}
+  .ad-day:active{transform:scale(.94)}
+  .ad-day.on{background:var(--color-brand-tint);border-color:var(--color-brand-line);color:var(--color-brand-deep)}
+  @media (max-width:420px){ .ad-hero{padding:18px 16px 14px} .ad-hero-time{font-size:30px} .ad-strip{gap:4px} }
+  @media (prefers-reduced-motion: reduce){ .ad-wave.on i,.ad-tick{animation:none} .ad-sw,.ad-sw::after{transition:none} .ad-card,.ad-strip>div{transition:none} .ad-card.ad-lift:hover{transform:none} }
 </style>
 <script>
 /* ===== Athar · جسر Supabase (سجل أحداث append-only + تسجيل دخول + RLS) =====
@@ -1807,6 +1840,8 @@
             className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
           h('button', {onClick:props.onAdhan, 'aria-label':'الأذان والتنبيهات', title:'الأذان والتنبيهات', className:'relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(Adhan.get().enabled?'text-inksoft hover:text-ink':'text-inkfaint')},
             h(Icon,{name:'Mosque', size:17}), (adSt.blocked||adSt.hint) ? h('span', {className:'absolute top-1.5 left-1.5 w-2 h-2 rounded-full', style:{background:'var(--pal-amber-dot)'}}) : null),
+          h('button', {onClick:props.onReminders, 'aria-label':'التذكيرات', title:'التذكيرات', className:'relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(Adhan.anyRemind()?'text-inksoft hover:text-ink':'text-inkfaint')},
+            h(Icon,{name:'Bell', size:16}), Adhan.anyRemind() ? h('span', {className:'absolute top-1.5 left-1.5 w-2 h-2 rounded-full', style:{background:'var(--color-brand)', boxShadow:'0 0 0 2px var(--color-surface)'}}) : null),
           h('button', {onClick:props.onSettings, 'aria-label':'الإعدادات', className:'w-9 h-9 rounded-full flex items-center justify-center text-inksoft hover:bg-linesoft hover:text-ink transition-smooth focus-ring'}, h(Icon,{name:'Settings2', size:16})),
           h('button', {onClick:props.onAdd, className:'btn-primary flex items-center gap-1.5 h-9 px-4 rounded-full text-white text-[13px] font-bold active:scale-95 transition-smooth focus-ring'},
             h(Icon,{name:'Plus', size:14, strokeWidth:2.4}), h('span',{className:'hidden sm:inline'}, props.addLabel || 'عادة جديدة')))));
@@ -1913,6 +1948,20 @@
      مفاتيح التخزين بدون بادئة athar. عمدًا (حتى لا تدخل سجل athar_events)؛ المزامنة إلى جدول prayer_settings. */
   var ADHAN_KEYS = ['fajr','dhuhr','asr','maghrib','isha'];
   var AD_DIRS = { adhan:['audio/adhan/','','مؤذن '], before:['audio/before/','before','تنبيه '], after:['audio/after/','after','ذكر '] };
+  /* التذكيرات: الملفات في audio/reminders/<file>.mp3 — mode:'clock' وقت ثابت · mode:'fajr' قبل الفجر بدقائق · days[i] حسب getDay() (0=الأحد) */
+  var RM_ALL=[1,1,1,1,1,1,1];
+  var RM = [
+    {id:'azkar', file:'morningevening', title:'أذكار الصباح والمساء', sub:'تذكير يومي بالصباح وبالمساء', icon:'Tasbih', slots:[
+      {key:'m', label:'أذكار الصباح', icon:'Sunrise', mode:'clock', time:'06:00', days:RM_ALL},
+      {key:'e', label:'أذكار المساء', icon:'Sunset', mode:'clock', time:'17:30', days:RM_ALL}]},
+    {id:'kahf', file:'kafh', title:'سورة الكهف', sub:'كل يوم جمعة', icon:'Quran', slots:[
+      {key:'a', label:'تذكير الجمعة', icon:'Clock', mode:'clock', time:'09:00', days:[0,0,0,0,0,1,0]}]},
+    {id:'wird', file:'quran', title:'ورد القرآن', sub:'وردك اليومي من القرآن', icon:'Rehal', daysUi:true, slots:[
+      {key:'a', label:'موعد الورد', icon:'Clock', mode:'clock', time:'21:00', days:RM_ALL}]},
+    {id:'suhoor', file:'sahour', title:'السحور', sub:'قبل أذان الفجر بمدة تختارها', icon:'Suhoor', daysUi:true, slots:[
+      {key:'a', label:'قبل أذان الفجر', icon:'Moon', mode:'fajr', min:60, days:RM_ALL}]}
+  ];
+  function rmDefaults(){ var o={}; RM.forEach(function(r){ o[r.id]={}; r.slots.forEach(function(sl){ o[r.id][sl.key]={on:false, time:sl.time||'00:00', min:sl.min||60, days:sl.days.slice()}; }); }); return {enabled:true, items:o}; }
   var Adhan = (function(){
     /* نفس اتصال ومفاتيح جسر Supabase أعلاه — لو غيّرتهما هناك غيّرهما هنا */
     var SB_URL='https://xgjkmbcvyxxlqxnckhhi.supabase.co', SB_KEY='sb_publishable_j-Jkn57NUHt9N1Gr_uUiMg_e03BOga3';
@@ -1922,10 +1971,10 @@
       w(0,'RIFF'); dv.setUint32(4,36+n,true); w(8,'WAVEfmt '); dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
       dv.setUint32(24,8000,true); dv.setUint32(28,8000,true); dv.setUint16(32,1,true); dv.setUint16(34,8,true); w(36,'data'); dv.setUint32(40,n,true);
       for(i=44;i<b.length;i++) b[i]=128; for(i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return 'data:audio/wav;base64,'+btoa(bin); })();
-    var subs=[], st={playing:null, blocked:false, hint:'', cloud:'idle', saved:0}, cat={adhan:0,before:0,after:0,ts:0,busy:false};
+    var subs=[], st={playing:null, blocked:false, hint:'', cloud:'idle', saved:0}, cat={adhan:0,before:0,after:0,ts:0,busy:false,rm:{}};
     var au=new Audio(), fadeT=null, stopT=null, pending=null, primed=false, boot=Date.now(), tSave=null, tPush=null, tRetry=null;
     function defaults(){ var p={}; ADHAN_KEYS.forEach(function(k){ p[k]={shift:0, before:{on:false,min:10,sound:1}, adhan:{on:true,sound:0}, after:{on:false,min:15,sound:1}}; });
-      return {_ts:0, enabled:true, unlocked:false, volume:0.8, fade:true, adhan:1, fajrAdhan:0, prayers:p}; }
+      return {_ts:0, enabled:true, unlocked:false, volume:0.8, fade:true, adhan:1, fajrAdhan:0, prayers:p, remind:rmDefaults()}; }
     function merge(d,s){ if(!s||typeof s!=='object') return d;
       Object.keys(d).forEach(function(k){ var dv=d[k], sv=s[k]; if(sv===undefined) return; if(dv&&typeof dv==='object') d[k]=merge(dv,sv); else if(typeof sv===typeof dv) d[k]=sv; }); return d; }
     var S=defaults();
@@ -1934,7 +1983,7 @@
     function emit(){ subs.slice().forEach(function(f){ try{ f(); }catch(e){} }); }
     function hint(m){ st.hint=m||''; emit(); }
     function vol(){ return Math.max(0, Math.min(1, S.volume)); }
-    function url(kind,n){ var d=AD_DIRS[kind]; return d[0]+d[1]+n+'.mp3'; }
+    function url(kind,n){ if(kind==='remind') return 'audio/reminders/'+n+'.mp3'; var d=AD_DIRS[kind]; return d[0]+d[1]+n+'.mp3'; }
 
     /* ---- اكتشاف الملفات: 1،2،3… حتى أول ملف غير موجود، والنتيجة تُخزَّن 6 ساعات ---- */
     function probe(u){
@@ -1946,9 +1995,9 @@
     function scanKind(kind){ var n=0; function step(){ if(n>=40) return Promise.resolve(n); return probe(url(kind,n+1)).then(function(ok){ if(!ok) return n; n++; return step(); }); } return step(); }
     function scan(force){
       if(cat.busy||(!force && Date.now()-cat.ts<216e5)) return; cat.busy=true; emit();
-      Promise.all(['adhan','before','after'].map(scanKind)).then(function(r){
-        cat.adhan=r[0]; cat.before=r[1]; cat.after=r[2]; cat.ts=Date.now(); cat.busy=false;
-        try{ window.localStorage.setItem(CK, JSON.stringify({adhan:r[0],before:r[1],after:r[2],ts:cat.ts})); }catch(e){} emit();
+      Promise.all(['adhan','before','after'].map(scanKind).concat(RM.map(function(x){ return probe(url('remind',x.file)); }))).then(function(r){
+        cat.adhan=r[0]; cat.before=r[1]; cat.after=r[2]; cat.rm={}; RM.forEach(function(x,i){ cat.rm[x.file]=!!r[3+i]; }); cat.ts=Date.now(); cat.busy=false;
+        try{ window.localStorage.setItem(CK, JSON.stringify({adhan:r[0],before:r[1],after:r[2],rm:cat.rm,ts:cat.ts})); }catch(e){} emit();
       }).catch(function(){ cat.busy=false; emit(); });
     }
 
@@ -1961,8 +2010,8 @@
     function end(){ clearInterval(fadeT); var v=au.volume, t0=Date.now(); fadeT=setInterval(function(){ var k=Math.min(1,(Date.now()-t0)/350); au.volume=v*(1-k); if(k>=1) stop(); },40); }
     function play(kind,n,o){
       o=o||{}; stop(true);
-      if(cat[kind]&&n>cat[kind]) n=1;
-      if(!n||(cat.ts&&!cat[kind])){ hint('لا توجد ملفات في مجلد '+AD_DIRS[kind][0]); return false; }
+      if(kind!=='remind'&&cat[kind]&&n>cat[kind]) n=1;
+      if(!n||(kind!=='remind'&&cat.ts&&!cat[kind])){ hint('لا توجد ملفات في مجلد '+AD_DIRS[kind][0]); return false; }
       var u=url(kind,n); au.src=u; au.volume=o.fade?0:vol();
       st.playing=o.key||(kind+n); st.hint=''; emit();
       var p=au.play();
@@ -1994,17 +2043,27 @@
     function timesFor(date){ var b=computePrayerTimes(date,getActiveLocation()), o={}; ADHAN_KEYS.forEach(function(k){ var m=Math.round(b[k]*60); o[k]={base:m, adj:m+S.prayers[k].shift}; }); return o; }
     function at(d,min){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()+min*60000; }
     function dkey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+    function remindEvents(d,t){ var out=[], R=S.remind; if(!R||!R.items) return out;
+      RM.forEach(function(r){ var it=R.items[r.id]; if(!it) return;
+        r.slots.forEach(function(sl){ var c=it[sl.key]; if(!c) return;
+          var q=String(c.time||'00:00').split(':'), m=sl.mode==='fajr' ? t.fajr.adj-(c.min||60) : (+q[0]||0)*60+(+q[1]||0);
+          out.push({id:dkey(d)+'|r:'+r.id+sl.key+'@'+m, k:r.id, kind:'remind', on:!!c.on&&!!(c.days&&c.days[d.getDay()]), n:r.file, t:at(d,m), rid:r.id, sk:sl.key}); }); });
+      return out; }
+    function nextRemind(ms){ if(!S.remind||!S.remind.enabled) return null; var d0=new Date(ms), best=null;
+      for(var o=0;o<=7;o++){ var d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+o); remindEvents(d,timesFor(d)).forEach(function(e){ if(e.on&&e.t>ms&&(!best||e.t<best.t)) best=e; }); }
+      return best; }
+    function anyRemind(){ var R=S.remind; return !!(R&&R.enabled&&RM.some(function(r){ return r.slots.some(function(sl){ return R.items[r.id]&&R.items[r.id][sl.key]&&R.items[r.id][sl.key].on; }); })); }
     function events(now){ var out=[];
       [-1,0,1].forEach(function(off){ var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+off), t=timesFor(d);
         ADHAN_KEYS.forEach(function(k){ var P=S.prayers[k], T=at(d,t[k].adj), id=dkey(d)+'|'+k+'|';
           out.push({id:id+'before',k:k,kind:'before',on:P.before.on,n:P.before.sound,t:T-P.before.min*60000});
           out.push({id:id+'adhan',k:k,kind:'adhan',on:P.adhan.on,n:adhanSound(k),t:T});
-          out.push({id:id+'after',k:k,kind:'after',on:P.after.on,n:P.after.sound,t:T+P.after.min*60000}); }); });
+          out.push({id:id+'after',k:k,kind:'after',on:P.after.on,n:P.after.sound,t:T+P.after.min*60000}); }); out=out.concat(remindEvents(d,t)); });
       return out.sort(function(a,b){ return a.t-b.t; }); }
     function next(ms){ var d0=new Date(ms), best=null;
       [0,1].forEach(function(o){ var d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+o), t=timesFor(d);
         ADHAN_KEYS.forEach(function(k){ var T=at(d,t[k].adj); if(T>ms&&(!best||T<best.t)) best={k:k,t:T}; }); });
-      return {p:best, a: S.enabled ? (events(d0).filter(function(e){ return e.on&&e.t>ms; })[0]||null) : null}; }
+      return {p:best, a: S.enabled ? (events(d0).filter(function(e){ return e.kind!=='remind'&&e.on&&e.t>ms; })[0]||null) : null}; }
 
     /* ---- الفحص الدوري: مقارنة بالوقت الفعلي (لا عدّ)، حدث واحد لكل معرّف، ونافذة سماح 90 ثانية ---- */
     function tick(){
@@ -2012,7 +2071,7 @@
       try{ cur=JSON.parse(window.localStorage.getItem(FK)||'{}')||{}; }catch(e){}
       list.forEach(function(e){ if(e.t>now||cur[e.id]) return; cur[e.id]=now; dirty=true; if(e.on && now-e.t<=9e4 && e.t>=boot-15e3) due=e; });
       if(dirty){ var keep={}; list.forEach(function(e){ if(cur[e.id]) keep[e.id]=cur[e.id]; }); try{ window.localStorage.setItem(FK,JSON.stringify(keep)); }catch(e){} }
-      if(due&&S.enabled) play(due.kind,due.n,{fade:due.kind==='adhan'&&S.fade, key:due.id});
+      if(due&&(due.kind==='remind'?(S.remind&&S.remind.enabled):S.enabled)) play(due.kind,due.n,{fade:due.kind==='adhan'&&S.fade, key:due.id});
     }
     (function clock(){ function t(){ try{ tick(); }catch(e){} } var iv=function(){ setInterval(t,1000); };
       try{ var w=new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(1)},1000)'],{type:'text/javascript'}))); w.onmessage=t; w.onerror=iv; }catch(e){ iv(); }
@@ -2051,8 +2110,9 @@
       get:function(){ return S; }, st:function(){ return st; }, cat:function(){ return cat; },
       sub:function(f){ subs.push(f); return function(){ subs=subs.filter(function(x){ return x!==f; }); }; },
       save:save, scan:scan, pull:pull, unlock:unlock, preview:preview, test:test, stopPreview:stopPreview,
-      next:next, timesFor:timesFor, defaultSound:adhanSound,
-      reset:function(){ var u=S.unlocked; save(function(){ var d=defaults(); d.unlocked=u; return d; }); },
+      next:next, timesFor:timesFor, defaultSound:adhanSound, nextRemind:nextRemind, anyRemind:anyRemind,
+      resetRemind:function(){ save(function(s){ s.remind=rmDefaults(); }); },
+      reset:function(){ var u=S.unlocked, rm=S.remind; save(function(){ var d=defaults(); d.unlocked=u; d.remind=rm; return d; }); },
       copyFrom:function(k){ save(function(s){ var src=s.prayers[k]; ADHAN_KEYS.forEach(function(o){ if(o===k) return; ['before','adhan','after'].forEach(function(r){ s.prayers[o][r]=JSON.parse(JSON.stringify(src[r])); }); }); }); }
     };
   })();
@@ -2080,10 +2140,12 @@
   }
   function AdAlert(p){
     var r=p.row;
-    return h('div', {className:'ad-row'},
+    return h('div', {className:'ad-row'+(r.on?' on':'')},
       h('div', {className:'flex items-center justify-between gap-3'},
-        h('span', {className:'text-[13.5px] font-extrabold'}, p.title), h(AdSwitch, {on:r.on, label:p.title, onChange:function(v){ p.set({on:v}); }})),
-      r.on ? h('div', {className:'mt-3 flex flex-wrap items-center gap-2 animate-fadeUp'},
+        h('div', {className:'flex items-center gap-3 min-w-0'}, p.icon ? h('span', {className:'ad-ico'}, h(Icon,{name:p.icon, size:16})) : null,
+          h('div', {className:'min-w-0'}, h('p', {className:'text-[13.5px] font-extrabold'}, p.title), p.sub ? h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, p.sub) : null)),
+        h(AdSwitch, {on:r.on, label:p.title, onChange:function(v){ p.set({on:v}); }})),
+      r.on ? h('div', {className:'mt-3.5 flex flex-wrap items-center gap-2 animate-fadeUp'},
         p.mins ? p.mins.map(function(m){ return h('button', {key:m, type:'button', onClick:function(){ p.set({min:m}); }, className:'ad-chip focus-ring'+(r.min===m?' on':'')}, m+' د'); }) : null,
         h(AdSelect, {kind:p.kind, n:Adhan.cat()[p.kind], val:r.sound, zero:p.zero, fallback:p.fallback, onPick:function(v){ p.set({sound:v}); }})) : null);
   }
@@ -2091,25 +2153,30 @@
     var k=p.k, P=Adhan.get().prayers[k], t=Adhan.timesFor(new Date())[k], cur=formatPrayerClock(t.adj/60), org=formatPrayerClock(t.base/60), open=p.open;
     function set(row,patch){ return function(x){ Adhan.save(function(s){ Object.assign(s.prayers[k][row], x); }); }; }
     function nudge(d){ Adhan.save(function(s){ s.prayers[k].shift=Math.max(-30,Math.min(30,s.prayers[k].shift+d)); }); }
-    return h('div', {className:'ad-card overflow-hidden'},
+    return h('div', {className:'ad-card ad-lift overflow-hidden'+(p.isNext?' is-next':'')},
       h('button', {type:'button', 'aria-expanded':open, onClick:p.onToggle, className:'w-full flex items-center gap-3.5 px-4 sm:px-5 py-4 text-right focus-ring'},
-        h('span', {className:'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0', style:{background:'var(--color-brand-tint)', color:'var(--color-brand-deep)'}}, h(Icon,{name:AD_ICON[k], size:19})),
+        h('span', {className:'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0', style:p.isNext ? {background:'var(--grad-brand)', color:'#fff', boxShadow:'0 8px 16px -8px rgba(46,110,147,.7)'} : {background:'var(--color-brand-tint)', color:'var(--color-brand-deep)'}}, h(Icon,{name:AD_ICON[k], size:19})),
         h('span', {className:'flex-1 min-w-0'},
           h('span', {className:'block text-[15.5px] font-extrabold'}, PRAYER_LABELS[k]),
-          h('span', {className:'block text-[11.5px] text-inkfaint mt-0.5 num'}, 'الأصلي '+org.text+' '+org.period)),
+          h('span', {className:'flex items-center flex-wrap gap-1.5 mt-1'},
+            p.isNext ? h('span', {className:'ad-pill next'}, 'القادمة') : null,
+            P.before.on ? h('span', {className:'ad-pill on'}, h(Icon,{name:'Bell', size:10}), 'قبل '+P.before.min+' د') : null,
+            P.adhan.on ? h('span', {className:'ad-pill on'}, h(Icon,{name:'Volume', size:10}), 'أذان') : null,
+            P.after.on ? h('span', {className:'ad-pill on'}, h(Icon,{name:'Sparkles', size:10}), 'بعد '+P.after.min+' د') : null,
+            P.shift ? h('span', {className:'ad-pill num'}, 'الأصلي '+org.text+' '+org.period) : null)),
         h('span', {key:cur.text, className:'ad-tick text-[20px] font-extrabold num'}, cur.text, h('small', {className:'text-[11px] font-bold text-inkfaint mr-1'}, cur.period)),
         h(Icon, {name:'ChevronDown', size:18, className:'text-inkfaint transition-smooth '+(open?'rotate-180':'')})),
       h('div', {className:'grid-expand'+(open?' is-open':'')}, h('div', null,
         h('div', {className:'px-4 sm:px-5 pb-5 space-y-3'},
           h('div', {className:'ad-row flex items-center justify-between gap-3'},
-            h('div', null, h('p', {className:'text-[13.5px] font-extrabold'}, 'تقديم / تأخير'), h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, '+ تأخير · − تقديم')),
+            h('div', {className:'flex items-center gap-3 min-w-0'}, h('span', {className:'ad-ico'}, h(Icon,{name:'Clock', size:16})), h('div', null, h('p', {className:'text-[13.5px] font-extrabold'}, 'تقديم / تأخير'), h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, '+ تأخير · − تقديم'))),
             h('div', {className:'flex items-center gap-2', dir:'ltr'},
               h('button', {type:'button', 'aria-label':'تقديم دقيقة', onClick:function(){ nudge(-1); }, className:'ad-step focus-ring'}, h(Icon,{name:'Minus', size:17})),
               h('span', {key:P.shift, className:'ad-tick w-14 text-center text-[15px] font-extrabold num'}, (P.shift>0?'+':'')+P.shift+' د'),
               h('button', {type:'button', 'aria-label':'تأخير دقيقة', onClick:function(){ nudge(1); }, className:'ad-step focus-ring'}, h(Icon,{name:'Plus', size:17})))),
-          h(AdAlert, {title:'قبل الأذان', kind:'before', row:P.before, mins:[5,10,15,20], set:set('before')}),
-          h(AdAlert, {title:'عند الأذان', kind:'adhan', row:P.adhan, zero:'المؤذن الافتراضي', fallback:Adhan.defaultSound(k), set:set('adhan')}),
-          h(AdAlert, {title:'بعد الأذان', kind:'after', row:P.after, mins:[10,15,20,30], set:set('after')}),
+          h(AdAlert, {title:'قبل الأذان', icon:'Bell', sub:'تنبيه قبل موعد الأذان', kind:'before', row:P.before, mins:[5,10,15,20], set:set('before')}),
+          h(AdAlert, {title:'عند الأذان', icon:'Volume', sub:'صوت الأذان عند دخول الوقت', kind:'adhan', row:P.adhan, zero:'المؤذن الافتراضي', fallback:Adhan.defaultSound(k), set:set('adhan')}),
+          h(AdAlert, {title:'بعد الأذان', icon:'Sparkles', sub:'ذكر أو تنبيه بعد الصلاة', kind:'after', row:P.after, mins:[10,15,20,30], set:set('after')}),
           h('button', {type:'button', onClick:function(){ Adhan.copyFrom(k); p.toast.push({message:'نُسخت إعدادات '+PRAYER_LABELS[k]+' لباقي الصلوات', icon:'Layers'}); },
             className:'w-full h-11 rounded-2xl border border-line text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-linesoft transition-smooth focus-ring'},
             h(Icon,{name:'Layers', size:14}), 'نسخ الإعدادات لباقي الصلوات')))));
@@ -2123,8 +2190,7 @@
     return h('div', {className:'sticky bottom-0 z-10 -mx-6 -mb-5 mt-5 px-6 pt-3 pb-4 bg-surface/90 backdrop-blur border-t border-line'},
       warn ? h('div', {className:'mb-2.5 flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-bold animate-fadeUp', style:{background:'var(--pal-amber-tint)', color:'var(--pal-amber-text)'}}, h(Icon,{name:'Info', size:14}), h('span', {className:'min-w-0'}, warn)) : null,
       h('div', {className:'flex items-center gap-4'},
-        h('div', {className:'flex-1 grid grid-cols-2 gap-3 min-w-0'},
-          nx.p ? cell('الصلاة القادمة', PRAYER_LABELS[nx.p.k], hms(nx.p.t-now)) : null,
+        h('div', {className:'flex-1 min-w-0'},
           cell('التنبيه القادم', nx.a ? KL[nx.a.kind]+PRAYER_LABELS[nx.a.k] : 'لا يوجد', nx.a ? hms(nx.a.t-now) : '—')),
         h('div', {className:'flex flex-col items-end gap-1 shrink-0'},
           h('button', {type:'button', onClick:function(){ if(window.confirm('استعادة إعدادات الأذان الافتراضية؟')) Adhan.reset(); }, className:'h-10 px-4 rounded-full border border-line text-[12.5px] font-bold flex items-center gap-1.5 hover:bg-linesoft transition-smooth focus-ring'}, h(Icon,{name:'RotateCcw', size:13}), 'استعادة الافتراضي'),
@@ -2136,11 +2202,12 @@
     useEffect(function(){ if(st.saved && st.saved!==last.current){ last.current=st.saved; toast.push({message:'تم الحفظ', icon:'CheckCircle2', duration:1400}); } });
     useEffect(function(){ Adhan.scan(false); Adhan.pull(); return function(){ Adhan.stopPreview(); }; }, []);
     function set(k,v){ Adhan.save(function(s){ s[k]=v; }); }
-    function sec(title,children){ return h('div', {className:'ad-card p-4 sm:p-5 space-y-3'}, h('h4', {className:'text-[12.5px] font-extrabold text-inksoft'}, title), children); }
+    function sec(title,children){ return adSec(title, {'عام':'Settings2','المؤذن':'Mosque'}[title], children); }
     function row(title,sub,ctrl){ return h('div', {className:'flex items-center justify-between gap-3'}, h('div', {className:'min-w-0'}, h('p', {className:'text-[14px] font-extrabold'}, title), sub ? h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, sub) : null), ctrl); }
-    var vp=Math.round(S.volume*100);
+    var vp=Math.round(S.volume*100), tk=useTicker(20000), nxk=(Adhan.next(tk).p||{}).k;
     return h(ModalShell, {title:'الأذان والتنبيهات', onClose:props.onClose, wide:true},
       h('div', {className:'space-y-4'},
+        h(AdHero, null),
         sec('عام', h('div', {className:'space-y-4'},
           row('تفعيل الأذان','تشغيل التنبيهات والتاب مفتوح', h(AdSwitch, {on:S.enabled, label:'تفعيل الأذان', onChange:function(v){ set('enabled',v); }})),
           row('الصوت', S.unlocked ? 'المتصفح سمح بتشغيل الصوت' : 'المتصفح يمنع الصوت التلقائي حتى تفعّله مرة',
@@ -2163,8 +2230,107 @@
           h('div', {className:'flex items-center justify-between gap-3 pt-1'},
             h('span', {className:'text-[11.5px] text-inkfaint num'}, 'ملفات: '+cat.adhan+' مؤذن · '+cat.before+' قبل · '+cat.after+' بعد'),
             h('button', {type:'button', onClick:function(){ Adhan.scan(true); }, className:'text-[12px] font-bold text-inksoft hover:text-ink transition-smooth focus-ring rounded-full px-2 h-8'}, cat.busy?'جارٍ الفحص…':'إعادة الفحص')))),
-        h('div', {className:'space-y-3'}, ADHAN_KEYS.map(function(k){ return h(AdPrayer, {key:k, k:k, open:open===k, toast:toast, onToggle:function(){ setOpen(open===k?null:k); }}); })),
+        h('div', {className:'space-y-3'}, h('div', {className:'ad-sec-h px-1 pt-1'}, h('span', {className:'ad-sec-ico'}, h(Icon,{name:'Bell', size:15})), h('h4', {className:'text-[14px] font-extrabold'}, 'التنبيهات لكل صلاة')), ADHAN_KEYS.map(function(k){ return h(AdPrayer, {key:k, k:k, isNext:nxk===k, open:open===k, toast:toast, onToggle:function(){ setOpen(open===k?null:k); }}); })),
         h(AdFooter, null)));
+  }
+
+  /* ================= الأذان · لمسات الواجهة + التذكيرات ================= */
+  function useTicker(ms){ var s=useState(Date.now()), v=s[0], set=s[1]; useEffect(function(){ var t=setInterval(function(){ set(Date.now()); }, ms); return function(){ clearInterval(t); }; }, []); return v; }
+  function adSec(title,icon,children){ return h('div', {className:'ad-card p-4 sm:p-5 space-y-4'}, h('div', {className:'ad-sec-h'}, icon ? h('span', {className:'ad-sec-ico'}, h(Icon,{name:icon, size:15})) : null, h('h4', {className:'text-[14px] font-extrabold'}, title)), children); }
+  function adRow(title,sub,ctrl){ return h('div', {className:'flex items-center justify-between gap-3'}, h('div', {className:'min-w-0'}, h('p', {className:'text-[14px] font-extrabold'}, title), sub ? h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, sub) : null), ctrl); }
+  function AdHero(){
+    var now=useTicker(1000), nx=Adhan.next(now).p; if(!nx) return null;
+    var d0=new Date(now), mid=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()).getTime(), tm=Adhan.timesFor(d0), nd=new Date(nx.t), clk=formatPrayerClock(nd.getHours()+nd.getMinutes()/60);
+    return h('div', {className:'ad-hero'},
+      h('div', {className:'relative z-[1] flex items-end justify-between gap-4'},
+        h('div', {className:'min-w-0'},
+          h('p', {className:'ad-hero-eyebrow'}, 'الصلاة القادمة'),
+          h('p', {className:'text-[28px] leading-tight font-extrabold mt-1'}, PRAYER_LABELS[nx.k]),
+          h('p', {className:'text-[13px] font-bold mt-0.5 num', style:{color:'rgba(255,255,255,.78)'}}, clk.text+' '+clk.period)),
+        h('div', {className:'text-left shrink-0', dir:'ltr'}, h('p', {className:'ad-hero-eyebrow'}, 'المتبقي'), h('p', {className:'ad-hero-time mt-1'}, hms(nx.t-now)))),
+      h('div', {className:'ad-strip relative z-[1]'}, ADHAN_KEYS.map(function(k){
+        var m=mid+tm[k].adj*60000, c=formatPrayerClock(tm[k].adj/60), cls=(nx.k===k&&nx.t<mid+864e5)?'is-next':(m<now?'is-past':'');
+        return h('div', {key:k, className:cls}, h('p', {className:'text-[10.5px] font-bold opacity-80'}, PRAYER_LABELS[k]), h('p', {className:'text-[13px] font-extrabold num mt-0.5'}, c.text)); })));
+  }
+  function AdTime(p){ return h('input', {type:'time', value:p.val, 'aria-label':p.label, onChange:function(e){ if(e.target.value) p.onChange(e.target.value); }, className:'ad-time focus-ring'}); }
+  var RM_WK=[[6,'سبت'],[0,'أحد'],[1,'اثنين'],[2,'ثلاثاء'],[3,'أربعاء'],[4,'خميس'],[5,'جمعة']];
+  function AdDays(p){ return h('div', {className:'flex flex-wrap gap-1.5', role:'group', 'aria-label':'أيام التذكير'}, RM_WK.map(function(w){ var on=!!p.days[w[0]];
+    return h('button', {key:w[0], type:'button', 'aria-pressed':on, onClick:function(){ p.onToggle(w[0]); }, className:'ad-day focus-ring'+(on?' on':'')}, w[1]); })); }
+  function remWhen(t,now){ var d=new Date(t), a=new Date(now), c=formatPrayerClock(d.getHours()+d.getMinutes()/60),
+      dd=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(a.getFullYear(),a.getMonth(),a.getDate()))/864e5),
+      wk=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    return (dd===0?'اليوم':dd===1?'غدًا':'يوم '+wk[d.getDay()])+' · '+c.text+' '+c.period; }
+  function RemSlot(p){
+    var r=p.r, sl=p.sl, c=p.c;
+    function set(x){ Adhan.save(function(s){ Object.assign(s.remind.items[r.id][sl.key], x); }); }
+    function day(i){ var n=c.days.slice(); n[i]=n[i]?0:1; if(!n.some(Boolean)) return; set({days:n}); }
+    var fj = sl.mode==='fajr' ? formatPrayerClock((Adhan.timesFor(new Date()).fajr.adj-c.min)/60) : null;
+    return h('div', {className:'ad-row'+(c.on?' on':'')},
+      h('div', {className:'flex items-center justify-between gap-3'},
+        h('div', {className:'flex items-center gap-3 min-w-0'}, h('span', {className:'ad-ico'}, h(Icon,{name:sl.icon, size:16})), h('span', {className:'text-[13.5px] font-extrabold truncate'}, sl.label)),
+        h(AdSwitch, {on:c.on, label:sl.label, onChange:function(v){ set({on:v}); }})),
+      c.on ? h('div', {className:'mt-3.5 space-y-3 animate-fadeUp'},
+        fj ? h('div', {className:'flex flex-wrap items-center gap-2'}, [30,45,60,90].map(function(m){ return h('button', {key:m, type:'button', onClick:function(){ set({min:m}); }, className:'ad-chip focus-ring'+(c.min===m?' on':'')}, m+' د'); }),
+              h('span', {className:'text-[12px] font-bold text-inkfaint num mr-1'}, 'اليوم تقريبًا '+fj.text+' '+fj.period))
+          : h('div', {className:'flex items-center gap-3'}, h('span', {className:'text-[12px] font-bold text-inkfaint'}, 'الوقت'), h(AdTime, {val:c.time, label:sl.label, onChange:function(v){ set({time:v}); }})),
+        r.daysUi ? h(AdDays, {days:c.days, onToggle:day}) : null) : null);
+  }
+  function RemCard(p){
+    var r=p.r, it=Adhan.get().remind.items[r.id], miss=Adhan.cat().rm[r.file]===false, open=p.open,
+        act=r.slots.filter(function(sl){ return it[sl.key].on; });
+    function lab(sl){ var c=it[sl.key]; if(sl.mode==='fajr') return 'قبل الفجر '+c.min+' د'; var q=String(c.time).split(':'), f=formatPrayerClock((+q[0]||0)+(+q[1]||0)/60); return (r.slots.length>1?sl.label.replace('أذكار ','')+' ':'')+f.text+' '+f.period; }
+    return h('div', {className:'ad-card ad-lift overflow-hidden'+(act.length?' is-on':'')},
+      h('button', {type:'button', 'aria-expanded':open, onClick:p.onToggle, className:'w-full flex items-center gap-3.5 px-4 sm:px-5 py-4 text-right focus-ring'},
+        h('span', {className:'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0', style:act.length ? {background:'var(--grad-brand)', color:'#fff', boxShadow:'0 8px 16px -8px rgba(46,110,147,.7)'} : {background:'var(--color-brand-tint)', color:'var(--color-brand-deep)'}}, h(Icon,{name:r.icon, size:19})),
+        h('span', {className:'flex-1 min-w-0'},
+          h('span', {className:'block text-[15.5px] font-extrabold'}, r.title),
+          h('span', {className:'flex items-center flex-wrap gap-1.5 mt-1'},
+            act.length ? act.map(function(sl){ return h('span', {key:sl.key, className:'ad-pill on num'}, h(Icon,{name:'Bell', size:10}), lab(sl)); }) : h('span', {className:'text-[11.5px] text-inkfaint'}, r.sub),
+            miss ? h('span', {className:'ad-pill warn'}, 'الملف غير موجود') : null)),
+        h(Icon, {name:'ChevronDown', size:18, className:'text-inkfaint transition-smooth '+(open?'rotate-180':'')})),
+      h('div', {className:'grid-expand'+(open?' is-open':'')}, h('div', null,
+        h('div', {className:'px-4 sm:px-5 pb-5 space-y-3'},
+          r.slots.map(function(sl){ return h(RemSlot, {key:sl.key, r:r, sl:sl, c:it[sl.key]}); }),
+          h('div', {className:'flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border border-dashed border-line'},
+            h('div', {className:'min-w-0'}, h('p', {className:'text-[12.5px] font-extrabold'}, 'ملف الصوت'),
+              h('p', {className:'text-[11px] text-inkfaint mt-0.5 num truncate', dir:'ltr', style:{textAlign:'right'}}, 'audio/reminders/'+r.file+'.mp3'),
+              miss ? h('p', {className:'text-[11.5px] font-bold mt-1', style:{color:'var(--pal-amber-text)'}}, 'ضع الملف في هذا المسار ثم أعد الفحص') : null),
+            h(AdPlay, {kind:'remind', n:r.file}))))));
+  }
+  function RemindersPanel(props){
+    var st=useAdhan(), toast=useToast(), S=Adhan.get(), cat=Adhan.cat(), now=useTicker(1000);
+    var o=useState('azkar'), open=o[0], setOpen=o[1], last=useRef(st.saved);
+    useEffect(function(){ if(st.saved && st.saved!==last.current){ last.current=st.saved; toast.push({message:'تم الحفظ', icon:'CheckCircle2', duration:1400}); } });
+    useEffect(function(){ Adhan.scan(!Object.keys(Adhan.cat().rm||{}).length); Adhan.pull(); return function(){ Adhan.stopPreview(); }; }, []);
+    var R=S.remind, nx=Adhan.nextRemind(now), nr=nx&&RM.filter(function(r){ return r.id===nx.rid; })[0], ns=nr&&nr.slots.filter(function(x){ return x.key===nx.sk; })[0];
+    var vp=Math.round(S.volume*100), warn=st.hint||(st.blocked?'المتصفح منع الصوت — اضغط أي مكان لتفعيله':''), ms=nx?nx.t-now:0, days=ms>=864e5;
+    return h(ModalShell, {title:'التذكيرات', onClose:props.onClose, wide:true},
+      h('div', {className:'space-y-4'},
+        h('div', {className:'ad-hero'},
+          h('div', {className:'relative z-[1] flex items-end justify-between gap-4'},
+            h('div', {className:'min-w-0'},
+              h('p', {className:'ad-hero-eyebrow'}, 'التذكير القادم'),
+              h('p', {className:'text-[24px] leading-tight font-extrabold mt-1 truncate'}, nx ? (nr.slots.length>1 ? ns.label : nr.title) : 'لا توجد تذكيرات مفعّلة'),
+              h('p', {className:'text-[12.5px] font-bold mt-0.5 num', style:{color:'rgba(255,255,255,.78)'}}, nx ? remWhen(nx.t, now) : (R.enabled ? 'فعّل تذكيرًا من القائمة بالأسفل' : 'التذكيرات متوقفة حاليًا'))),
+            nx ? h('div', {className:'text-left shrink-0', dir:days?'rtl':'ltr'}, h('p', {className:'ad-hero-eyebrow'}, 'المتبقي'), h('p', {className:'ad-hero-time mt-1'+(days?' sm':'')}, days ? Math.floor(ms/864e5)+' يوم · '+hms(ms%864e5).slice(0,5) : hms(ms))) : null)),
+        adSec('عام', 'Settings2', h('div', {className:'space-y-4'},
+          adRow('تفعيل التذكيرات','تعمل والتاب مفتوح', h(AdSwitch, {on:R.enabled, label:'تفعيل التذكيرات', onChange:function(v){ Adhan.save(function(s){ s.remind.enabled=v; }); }})),
+          adRow('الصوت', S.unlocked ? 'المتصفح سمح بتشغيل الصوت' : 'المتصفح يمنع الصوت التلقائي حتى تفعّله مرة',
+            S.unlocked ? h('span', {className:'h-10 px-4 rounded-full flex items-center text-[12.5px] font-extrabold', style:{background:'var(--pal-green-tint)', color:'var(--pal-green-text)'}}, '✓ الصوت مفعّل')
+              : h('button', {type:'button', onClick:function(){ Adhan.unlock(); }, className:'btn-primary h-10 px-5 rounded-full text-white text-[12.5px] font-bold active:scale-95 transition-smooth focus-ring'}, 'تفعيل الصوت')),
+          h('div', null,
+            h('div', {className:'flex items-center justify-between mb-2.5'}, h('span', {className:'text-[13px] font-extrabold'}, 'مستوى الصوت', h('span', {className:'text-[11px] font-bold text-inkfaint mr-2'}, 'مشترك مع الأذان')), h('span', {className:'text-[13px] font-extrabold num'}, vp+'%')),
+            h('input', {type:'range', min:0, max:100, value:vp, 'aria-label':'مستوى الصوت', className:'ad-range', style:{'--p':vp+'%'}, onChange:function(e){ Adhan.save(function(s){ s.volume=+e.target.value/100; }); }})))),
+        h('div', {className:'space-y-3'},
+          h('div', {className:'ad-sec-h px-1 pt-1'}, h('span', {className:'ad-sec-ico'}, h(Icon,{name:'Bell', size:15})), h('h4', {className:'text-[14px] font-extrabold'}, 'التذكيرات')),
+          RM.map(function(r){ return h(RemCard, {key:r.id, r:r, open:open===r.id, onToggle:function(){ setOpen(open===r.id?null:r.id); }}); })),
+        h('div', {className:'sticky bottom-0 z-10 -mx-6 -mb-5 mt-5 px-6 pt-3 pb-4 bg-surface/90 backdrop-blur border-t border-line'},
+          warn ? h('div', {className:'mb-2.5 flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-bold animate-fadeUp', style:{background:'var(--pal-amber-tint)', color:'var(--pal-amber-text)'}}, h(Icon,{name:'Info', size:14}), h('span', {className:'min-w-0'}, warn)) : null,
+          h('div', {className:'flex items-center justify-between gap-4'},
+            h('div', {className:'flex flex-col gap-0.5 min-w-0'},
+              h('span', {className:'text-[10.5px] font-bold', style:{color: st.cloud==='ok' ? 'var(--pal-green-text)' : 'var(--color-inkfaint)'}}, st.cloud==='ok' ? '● متزامن مع السحابة' : st.cloud==='wait' ? '● بانتظار المزامنة' : '● محفوظ على هذا الجهاز'),
+              h('button', {type:'button', onClick:function(){ Adhan.scan(true); }, className:'text-[11.5px] font-bold text-inksoft hover:text-ink transition-smooth focus-ring rounded-full text-right'}, cat.busy?'جارٍ فحص الملفات…':'إعادة فحص ملفات الصوت')),
+            h('button', {type:'button', onClick:function(){ if(window.confirm('استعادة إعدادات التذكيرات الافتراضية؟')) Adhan.resetRemind(); }, className:'h-10 px-4 rounded-full border border-line text-[12.5px] font-bold flex items-center gap-1.5 hover:bg-linesoft transition-smooth focus-ring shrink-0'}, h(Icon,{name:'RotateCcw', size:13}), 'استعادة الافتراضي')))));
   }
 
   function MaghribCountdown(){
@@ -5034,7 +5200,7 @@
     var s = useState(loadState()); var state=s[0], setState=s[1];
     var vs = useState('today'); var view=vs[0], setView=vs[1];
     var mh = useState(null); var modalHabit=mh[0], setModalHabit=mh[1];
-    var ss = useState(false); var showSettings=ss[0], setShowSettings=ss[1]; var ad_ = useState(false); var showAdhan=ad_[0], setShowAdhan=ad_[1];
+    var ss = useState(false); var showSettings=ss[0], setShowSettings=ss[1]; var ad_ = useState(false); var showAdhan=ad_[0], setShowAdhan=ad_[1]; var rm_ = useState(false); var showReminders=rm_[0], setShowReminders=rm_[1];
     var ds = useState(null); var deleteTarget=ds[0], setDeleteTarget=ds[1];
     var pzs = useState(null); var pauseTarget=pzs[0], setPauseTarget=pzs[1];
     var fs = useState('all'); var filter=fs[0], setFilter=fs[1];
@@ -5388,7 +5554,7 @@
     /* ===== Command palette + global shortcuts ===== */
     var cps = useState(false); var showPalette=cps[0], setShowPalette=cps[1];
     var shs = useState(false); var showShortcuts=shs[0], setShowShortcuts=shs[1];
-    var overlayOpen = !!(modalHabit || showSettings || showAdhan || deleteTarget || pauseTarget || showPalette || showShortcuts);
+    var overlayOpen = !!(modalHabit || showSettings || showAdhan || showReminders || deleteTarget || pauseTarget || showPalette || showShortcuts);
     var kbdRef = useRef({});
     kbdRef.current = {overlayOpen:overlayOpen, tasksModule:tasksModule};
 
@@ -5408,6 +5574,7 @@
       {id:'act-task', group:'act', label:'مهمة جديدة', icon:'Zap', kbd:['T'], keywords:'add new task إضافة', run:function(){ tasksModule.openEditor(); }},
       {id:'act-theme', group:'act', label:'تبديل الوضع الداكن', icon:'Moon', kbd:['D'], keywords:'dark light theme الثيم المظهر', run:toggleTheme},
       {id:'act-export', group:'act', label:'تصدير نسخة احتياطية', icon:'Download', keywords:'export backup تنزيل', run:handleExport},
+      {id:'act-reminders', group:'act', label:'التذكيرات', icon:'Bell', keywords:'reminders azkar kahf quran wird suhoor تذكير أذكار الكهف الورد السحور', run:function(){ setShowReminders(true); }},
       {id:'act-settings', group:'act', label:'الإعدادات', icon:'Settings2', keywords:'settings تصنيفات', run:function(){ setShowSettings(true); }}
     ];
     ['category','period','priority'].filter(function(m){ return m!==groupMode; }).forEach(function(m){
@@ -5452,7 +5619,7 @@
 
     return h(Fragment, null,
       h('div', {className:'min-h-screen flex flex-col'},
-        h(TopBar, {view:view, setView:setView, addLabel: view==='tasks' ? 'مهمة جديدة' : null, onAdd:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, onSettings:function(){ setShowSettings(true); }, onAdhan:function(){ setShowAdhan(true); }}),
+        h(TopBar, {view:view, setView:setView, addLabel: view==='tasks' ? 'مهمة جديدة' : null, onAdd:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, onSettings:function(){ setShowSettings(true); }, onAdhan:function(){ setShowAdhan(true); }, onReminders:function(){ setShowReminders(true); }}),
         view==='today' ? h('div', {key:'hero-today', className:'view-enter'}, h(MaghribCountdown, null), h(HeroToday, {habits:state.habits, progress:state.progress})) : null,
         h('div', {className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'},
           view==='today' ? tasksModule.sidebarActive : null,
@@ -5482,6 +5649,7 @@
       tasksModule.overlays,
       modalHabit ? h(HabitEditorModal, {initial:modalHabit, categories:state.categories, periods:state.periods, priorities:state.priorities, onCreatePriority:createPriority, onCreatePeriod:createPeriod, onCreateCategory:createCategory, onClose:function(){ setModalHabit(null); }, onSave:saveHabit, onRequestDelete:function(hb){ setDeleteTarget(hb); }}) : null,
       showAdhan ? h(AdhanPanel, {onClose:function(){ setShowAdhan(false); }}) : null,
+      showReminders ? h(RemindersPanel, {onClose:function(){ setShowReminders(false); }}) : null,
       showSettings ? h(SettingsModal, {periods:state.periods, onCreatePeriod:createPeriod, onRenamePeriod:renamePeriod, onStylePeriod:function(id,p){ styleListItem('periods', id, p); }, onDeletePeriod:deletePeriod, onReorderPeriod:reorderPeriod,
         priorities:state.priorities, onCreatePriority:createPriority, onRenamePriority:renamePriority, onStylePriority:function(id,p){ styleListItem('priorities', id, p); }, onDeletePriority:deletePriority, onReorderPriority:reorderPriority,
         onStyleCategory:function(id,p){ styleListItem('categories', id, p); }, categories:state.categories, habits:state.habits, onCreateCategory:createCategory, onRenameCategory:renameCategory, onDeleteCategory:deleteCategory, onReorderCategory:reorderCategory,
