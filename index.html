@@ -561,6 +561,34 @@
   :root[data-theme="dark"] .bg-surface\/85{ background-color: rgba(18,22,29,.82); }
   :root[data-theme="dark"] input, :root[data-theme="dark"] textarea, :root[data-theme="dark"] select{ color-scheme:dark; }
   :root[data-theme="dark"] input::placeholder, :root[data-theme="dark"] textarea::placeholder{ color:var(--color-inkfaint); opacity:.85; }
+
+  /* ===== الأذان (ad-*) ===== */
+  .ad-sw{position:relative;width:46px;height:27px;border-radius:999px;background:var(--color-line);flex:none;transition:background .3s cubic-bezier(.2,.8,.2,1)}
+  .ad-sw::after{content:'';position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(22,33,44,.28);transition:transform .32s cubic-bezier(.34,1.4,.64,1)}
+  .ad-sw[aria-checked=true]{background:var(--color-brand)}
+  .ad-sw[aria-checked=true]::after{transform:translateX(-19px)}
+  .ad-card{border:1px solid var(--color-line);background:linear-gradient(180deg,var(--color-surface),var(--color-raised));border-radius:22px;box-shadow:0 1px 2px rgba(22,33,44,.03),0 10px 26px -16px rgba(22,33,44,.18)}
+  .ad-row{padding:14px 16px;border-radius:16px;background:var(--color-linesoft);border:1px solid var(--color-line)}
+  .ad-chip{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--color-line);background:var(--color-surface);font-size:12.5px;font-weight:700;color:var(--color-inksoft);transition:all .25s cubic-bezier(.2,.8,.2,1)}
+  .ad-chip.on{background:var(--color-brand-tint);border-color:var(--color-brand-line);color:var(--color-brand-deep)}
+  .ad-step{width:44px;height:44px;border-radius:14px;border:1px solid var(--color-line);background:var(--color-surface);display:flex;align-items:center;justify-content:center;color:var(--color-ink);box-shadow:0 1px 2px rgba(22,33,44,.05);transition:transform .15s,background .25s}
+  .ad-step:hover{background:var(--color-brand-tint)} .ad-step:active{transform:scale(.9)}
+  .ad-select{appearance:none;-webkit-appearance:none;height:40px;min-width:0;padding:0 14px 0 34px;border-radius:12px;border:1px solid var(--color-line);background:var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238794A0' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat 12px center;color:var(--color-ink);font:inherit;font-size:13px;font-weight:700}
+  .ad-play{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--color-brand-tint);color:var(--color-brand-deep);transition:all .25s}
+  .ad-play:hover{background:var(--color-brand-line)} .ad-play.on{background:var(--grad-brand);color:#fff;box-shadow:0 6px 16px -6px rgba(46,110,147,.55)}
+  .ad-voice{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 10px 10px 12px;border-radius:16px;border:1px solid var(--color-line);background:var(--color-surface);text-align:right;transition:all .28s cubic-bezier(.2,.8,.2,1)}
+  .ad-voice.sel{border-color:var(--color-brand);background:var(--color-brand-tint);box-shadow:0 0 0 3px var(--color-brand-line)}
+  .ad-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;outline:none;background:linear-gradient(to left,var(--color-brand) var(--p,80%),var(--color-line) var(--p,80%))}
+  .ad-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid var(--color-line);box-shadow:0 2px 8px rgba(22,33,44,.25)}
+  .ad-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid var(--color-line);box-shadow:0 2px 8px rgba(22,33,44,.25)}
+  .ad-wave{display:inline-flex;align-items:center;gap:2px;height:16px}
+  .ad-wave i{width:3px;height:4px;border-radius:2px;background:currentColor}
+  .ad-wave.on i{animation:adWave .9s ease-in-out infinite}
+  .ad-wave i:nth-child(2){animation-delay:.12s}.ad-wave i:nth-child(3){animation-delay:.26s}.ad-wave i:nth-child(4){animation-delay:.4s}.ad-wave i:nth-child(5){animation-delay:.18s}
+  @keyframes adWave{0%,100%{height:4px}50%{height:16px}}
+  .ad-tick{display:inline-block;animation:adTick .32s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes adTick{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){ .ad-wave.on i,.ad-tick{animation:none} .ad-sw,.ad-sw::after{transition:none} }
 </style>
 <script>
 /* ===== Athar · جسر Supabase (سجل أحداث append-only + تسجيل دخول + RLS) =====
@@ -1767,7 +1795,7 @@
   })();
 
   function TopBar(props){
-    var sfx = useState(SFX.isOn()); var sfxOn = sfx[0], setSfxOn = sfx[1];
+    var sfx = useState(SFX.isOn()); var sfxOn = sfx[0], setSfxOn = sfx[1]; var adSt = useAdhan();
     return h('div', {className:'sticky top-0 z-40 bg-surface/85 backdrop-blur-md border-b border-line shadow-[0_1px_0_rgba(22,33,44,0.02)]'},
       h('div', {className:'app-wrap mx-auto px-5 md:px-8 h-[68px] grid grid-cols-[1fr_auto_1fr] items-center gap-3'},
         h('div', {className:'flex items-center gap-2.5 shrink-0 justify-self-start'},
@@ -1777,6 +1805,8 @@
         h('div', {className:'flex items-center gap-2 shrink-0 justify-self-end'},
           h('button', {onClick:function(){ setSfxOn(SFX.toggle()); }, 'aria-label':sfxOn?'كتم أصوات الإنجاز':'تشغيل أصوات الإنجاز', 'aria-pressed':sfxOn, title:sfxOn?'الصوت: مفعّل':'الصوت: مكتوم',
             className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
+          h('button', {onClick:props.onAdhan, 'aria-label':'الأذان والتنبيهات', title:'الأذان والتنبيهات', className:'relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(Adhan.get().enabled?'text-inksoft hover:text-ink':'text-inkfaint')},
+            h(Icon,{name:'Mosque', size:17}), (adSt.blocked||adSt.hint) ? h('span', {className:'absolute top-1.5 left-1.5 w-2 h-2 rounded-full', style:{background:'var(--pal-amber-dot)'}}) : null),
           h('button', {onClick:props.onSettings, 'aria-label':'الإعدادات', className:'w-9 h-9 rounded-full flex items-center justify-center text-inksoft hover:bg-linesoft hover:text-ink transition-smooth focus-ring'}, h(Icon,{name:'Settings2', size:16})),
           h('button', {onClick:props.onAdd, className:'btn-primary flex items-center gap-1.5 h-9 px-4 rounded-full text-white text-[13px] font-bold active:scale-95 transition-smooth focus-ring'},
             h(Icon,{name:'Plus', size:14, strokeWidth:2.4}), h('span',{className:'hidden sm:inline'}, props.addLabel || 'عادة جديدة')))));
@@ -1877,6 +1907,256 @@
     var period = hh>=12? 'م':'ص';
     var hh12 = hh%12; if(hh12===0) hh12=12;
     return { text: String(hh12).padStart(2,'0')+':'+String(mm).padStart(2,'0'), period: period };
+  }
+
+  /* ================= الأذان · محرك + تخزين + مزامنة =================
+     مفاتيح التخزين بدون بادئة athar. عمدًا (حتى لا تدخل سجل athar_events)؛ المزامنة إلى جدول prayer_settings. */
+  var ADHAN_KEYS = ['fajr','dhuhr','asr','maghrib','isha'];
+  var AD_DIRS = { adhan:['audio/adhan/','','مؤذن '], before:['audio/before/','before','تنبيه '], after:['audio/after/','after','ذكر '] };
+  var Adhan = (function(){
+    /* نفس اتصال ومفاتيح جسر Supabase أعلاه — لو غيّرتهما هناك غيّرهما هنا */
+    var SB_URL='https://xgjkmbcvyxxlqxnckhhi.supabase.co', SB_KEY='sb_publishable_j-Jkn57NUHt9N1Gr_uUiMg_e03BOga3';
+    var LSK='adhan.settings.v1', CK='adhan.catalog.v1', FK='adhan.fired.v1', AUTHK='athar.auth.v1';
+    var SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+    var subs=[], st={playing:null, blocked:false, hint:'', cloud:'idle', saved:0}, cat={adhan:0,before:0,after:0,ts:0,busy:false};
+    var au=new Audio(), fadeT=null, stopT=null, pending=null, primed=false, boot=Date.now(), tSave=null, tPush=null, tRetry=null;
+    function defaults(){ var p={}; ADHAN_KEYS.forEach(function(k){ p[k]={shift:0, before:{on:false,min:10,sound:1}, adhan:{on:true,sound:0}, after:{on:false,min:15,sound:1}}; });
+      return {_ts:0, enabled:true, unlocked:false, volume:0.8, fade:true, adhan:1, fajrAdhan:0, prayers:p}; }
+    function merge(d,s){ if(!s||typeof s!=='object') return d;
+      Object.keys(d).forEach(function(k){ var dv=d[k], sv=s[k]; if(sv===undefined) return; if(dv&&typeof dv==='object') d[k]=merge(dv,sv); else if(typeof sv===typeof dv) d[k]=sv; }); return d; }
+    var S=defaults();
+    try{ S=merge(defaults(), JSON.parse(window.localStorage.getItem(LSK)||'null')); }catch(e){}
+    try{ var cc=JSON.parse(window.localStorage.getItem(CK)||'null'); if(cc&&cc.ts) Object.assign(cat,cc); }catch(e){}
+    function emit(){ subs.slice().forEach(function(f){ try{ f(); }catch(e){} }); }
+    function hint(m){ st.hint=m||''; emit(); }
+    function vol(){ return Math.max(0, Math.min(1, S.volume)); }
+    function url(kind,n){ var d=AD_DIRS[kind]; return d[0]+d[1]+n+'.mp3'; }
+
+    /* ---- اكتشاف الملفات: 1،2،3… حتى أول ملف غير موجود، والنتيجة تُخزَّن 6 ساعات ---- */
+    function probe(u){
+      return fetch(u,{method:'HEAD',cache:'no-store'}).then(function(r){ return r.ok && !/text\/html/i.test(r.headers.get('content-type')||''); })
+        .catch(function(){ return new Promise(function(res){ var a=new Audio(), t=setTimeout(function(){ fin(false); },5000);
+          function fin(v){ clearTimeout(t); a.onloadedmetadata=a.onerror=null; res(v); }
+          a.preload='metadata'; a.onloadedmetadata=function(){ fin(true); }; a.onerror=function(){ fin(false); }; a.src=u; }); });
+    }
+    function scanKind(kind){ var n=0; function step(){ if(n>=40) return Promise.resolve(n); return probe(url(kind,n+1)).then(function(ok){ if(!ok) return n; n++; return step(); }); } return step(); }
+    function scan(force){
+      if(cat.busy||(!force && Date.now()-cat.ts<216e5)) return; cat.busy=true; emit();
+      Promise.all(['adhan','before','after'].map(scanKind)).then(function(r){
+        cat.adhan=r[0]; cat.before=r[1]; cat.after=r[2]; cat.ts=Date.now(); cat.busy=false;
+        try{ window.localStorage.setItem(CK, JSON.stringify({adhan:r[0],before:r[1],after:r[2],ts:cat.ts})); }catch(e){} emit();
+      }).catch(function(){ cat.busy=false; emit(); });
+    }
+
+    /* ---- المشغّل: عنصر صوت واحد؛ أي صوت جديد يوقف السابق ---- */
+    au.preload='auto';
+    au.onended=function(){ stop(); };
+    au.onerror=function(){ if(st.playing){ st.playing=null; st.hint='الملف غير موجود: '+(au.getAttribute('src')||''); emit(); } };
+    function stop(quiet){ clearInterval(fadeT); clearTimeout(stopT); try{ au.pause(); }catch(e){} st.playing=null; if(!quiet) emit(); }
+    function ramp(){ var t0=Date.now(); clearInterval(fadeT); fadeT=setInterval(function(){ var k=Math.min(1,(Date.now()-t0)/2500); au.volume=vol()*k; if(k>=1) clearInterval(fadeT); },80); }
+    function end(){ clearInterval(fadeT); var v=au.volume, t0=Date.now(); fadeT=setInterval(function(){ var k=Math.min(1,(Date.now()-t0)/350); au.volume=v*(1-k); if(k>=1) stop(); },40); }
+    function play(kind,n,o){
+      o=o||{}; stop(true);
+      if(cat[kind]&&n>cat[kind]) n=1;
+      if(!n||(cat.ts&&!cat[kind])){ hint('لا توجد ملفات في مجلد '+AD_DIRS[kind][0]); return false; }
+      var u=url(kind,n); au.src=u; au.volume=o.fade?0:vol();
+      st.playing=o.key||(kind+n); st.hint=''; emit();
+      var p=au.play();
+      if(p&&p.then) p.then(function(){ st.blocked=false; if(o.fade) ramp(); }).catch(function(e){
+        st.playing=null;
+        if(e&&e.name==='NotAllowedError'){ st.blocked=true; pending={kind:kind,n:n,o:o,until:Date.now()+18e4}; st.hint='المتصفح منع الصوت — اضغط أي مكان في الصفحة لتفعيله'; }
+        else if(!(e&&e.name==='AbortError')) st.hint='تعذّر تشغيل الملف '+u;
+        emit(); });
+      if(o.limit) stopT=setTimeout(end,o.limit);
+      return true;
+    }
+    function prime(){ au.src=SILENT; au.volume=0;
+      return Promise.resolve(au.play()).then(function(){ au.pause(); primed=true; st.blocked=false; var q=pending; pending=null; if(q&&Date.now()<q.until) play(q.kind,q.n,q.o); else emit(); }); }
+    function unlock(){ return prime().then(function(){ save(function(s){ s.unlocked=true; }); }).catch(function(){ hint('تعذّر تفعيل الصوت على هذا المتصفح'); }); }
+    window.addEventListener('pointerdown',function(){ if(primed||st.playing) return; prime().catch(function(){}); },true);
+    function preview(kind,n){
+      if(st.playing==='pv:'+kind+n){ end(); return; }
+      if(play(kind,n,{key:'pv:'+kind+n, limit:5000}) && !S.unlocked) save(function(s){ s.unlocked=true; });
+    }
+    function test(){ if(st.playing==='pv:test'){ end(); return; } play('adhan',S.adhan||1,{key:'pv:test', fade:S.fade, limit:7000}); }
+    function stopPreview(){ if(st.playing&&String(st.playing).indexOf('pv:')===0) stop(); }
+
+    /* ---- المواعيد والأحداث ---- */
+    function adhanSound(k){ return S.prayers[k].adhan.sound || (k==='fajr'&&S.fajrAdhan) || S.adhan || 1; }
+    function timesFor(date){ var b=computePrayerTimes(date,getActiveLocation()), o={}; ADHAN_KEYS.forEach(function(k){ var m=Math.round(b[k]*60); o[k]={base:m, adj:m+S.prayers[k].shift}; }); return o; }
+    function at(d,min){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()+min*60000; }
+    function dkey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+    function events(now){ var out=[];
+      [-1,0,1].forEach(function(off){ var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+off), t=timesFor(d);
+        ADHAN_KEYS.forEach(function(k){ var P=S.prayers[k], T=at(d,t[k].adj), id=dkey(d)+'|'+k+'|';
+          out.push({id:id+'before',k:k,kind:'before',on:P.before.on,n:P.before.sound,t:T-P.before.min*60000});
+          out.push({id:id+'adhan',k:k,kind:'adhan',on:P.adhan.on,n:adhanSound(k),t:T});
+          out.push({id:id+'after',k:k,kind:'after',on:P.after.on,n:P.after.sound,t:T+P.after.min*60000}); }); });
+      return out.sort(function(a,b){ return a.t-b.t; }); }
+    function next(ms){ var d0=new Date(ms), best=null;
+      [0,1].forEach(function(o){ var d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+o), t=timesFor(d);
+        ADHAN_KEYS.forEach(function(k){ var T=at(d,t[k].adj); if(T>ms&&(!best||T<best.t)) best={k:k,t:T}; }); });
+      return {p:best, a: S.enabled ? (events(d0).filter(function(e){ return e.on&&e.t>ms; })[0]||null) : null}; }
+
+    /* ---- الفحص الدوري: مقارنة بالوقت الفعلي (لا عدّ)، حدث واحد لكل معرّف، ونافذة سماح 90 ثانية ---- */
+    function tick(){
+      var now=Date.now(), list=events(new Date(now)), due=null, dirty=false, cur={};
+      try{ cur=JSON.parse(window.localStorage.getItem(FK)||'{}')||{}; }catch(e){}
+      list.forEach(function(e){ if(e.t>now||cur[e.id]) return; cur[e.id]=now; dirty=true; if(e.on && now-e.t<=9e4 && e.t>=boot-15e3) due=e; });
+      if(dirty){ var keep={}; list.forEach(function(e){ if(cur[e.id]) keep[e.id]=cur[e.id]; }); try{ window.localStorage.setItem(FK,JSON.stringify(keep)); }catch(e){} }
+      if(due&&S.enabled) play(due.kind,due.n,{fade:due.kind==='adhan'&&S.fade, key:due.id});
+    }
+    (function clock(){ function t(){ try{ tick(); }catch(e){} } var iv=function(){ setInterval(t,1000); };
+      try{ var w=new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(1)},1000)'],{type:'text/javascript'}))); w.onmessage=t; w.onerror=iv; }catch(e){ iv(); }
+      document.addEventListener('visibilitychange',t); })();
+
+    /* ---- الحفظ: localStorage فوري + Supabase في الخلفية ---- */
+    function save(mut){
+      var r=mut(S); if(r) S=r; S._ts=Date.now();
+      try{ window.localStorage.setItem(LSK,JSON.stringify(S)); }catch(e){}
+      if(au.src && st.playing) au.volume=vol();
+      emit(); clearTimeout(tSave); tSave=setTimeout(function(){ st.saved=Date.now(); emit(); },700);
+      clearTimeout(tPush); tPush=setTimeout(push,1500);
+    }
+    function sess(){ try{ return JSON.parse(window.localStorage.getItem(AUTHK)||'null'); }catch(e){ return null; } }
+    function api(method,path,body,extra){
+      var s=sess(); if(!s||!s.access_token) return Promise.reject(new Error('nosess'));
+      var hd={'apikey':SB_KEY,'Authorization':'Bearer '+s.access_token,'Content-Type':'application/json'}; Object.assign(hd,extra||{});
+      return fetch(SB_URL.replace(/\/+$/,'')+'/rest/v1/'+path,{method:method,headers:hd,body:body?JSON.stringify(body):undefined}).then(function(r){
+        if(!r.ok) throw new Error(String(r.status)); return r.status===204?null:r.text().then(function(x){ return x?JSON.parse(x):null; }); });
+    }
+    function fail(e){ var m=e&&e.message; st.cloud=(m==='nosess'||m==='404')?'off':'wait'; emit(); clearTimeout(tRetry); if(st.cloud==='wait') tRetry=setTimeout(pull,20000); }
+    function push(){ var s=sess();
+      return api('POST','prayer_settings?on_conflict=user_id',{user_id:s&&s.uid, data:JSON.parse(JSON.stringify(S)), updated_at:new Date().toISOString()},{'Prefer':'resolution=merge-duplicates,return=minimal'})
+        .then(function(){ st.cloud='ok'; emit(); }).catch(fail); }
+    function pull(){
+      return api('GET','prayer_settings?select=data&limit=1').then(function(rows){
+        var d=rows&&rows[0]&&rows[0].data, rt=(d&&d._ts)||0;
+        if(rt>(S._ts||0)){ S=merge(defaults(),d); try{ window.localStorage.setItem(LSK,JSON.stringify(S)); }catch(e){} st.cloud='ok'; emit(); }
+        else if((S._ts||0)>rt) return push(); else { st.cloud='ok'; emit(); }
+      }).catch(fail); }
+    window.addEventListener('online',pull);
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) pull(); });
+    setTimeout(function(){ scan(false); pull(); },1200);
+
+    return {
+      get:function(){ return S; }, st:function(){ return st; }, cat:function(){ return cat; },
+      sub:function(f){ subs.push(f); return function(){ subs=subs.filter(function(x){ return x!==f; }); }; },
+      save:save, scan:scan, pull:pull, unlock:unlock, preview:preview, test:test, stopPreview:stopPreview,
+      next:next, timesFor:timesFor, defaultSound:adhanSound,
+      reset:function(){ var u=S.unlocked; save(function(){ var d=defaults(); d.unlocked=u; return d; }); },
+      copyFrom:function(k){ save(function(s){ var src=s.prayers[k]; ADHAN_KEYS.forEach(function(o){ if(o===k) return; ['before','adhan','after'].forEach(function(r){ s.prayers[o][r]=JSON.parse(JSON.stringify(src[r])); }); }); }); }
+    };
+  })();
+
+  /* ================= الأذان · الواجهة ================= */
+  function useAdhan(){ var s=useState(0), f=s[1]; useEffect(function(){ return Adhan.sub(function(){ f(function(x){ return x+1; }); }); }, []); return Adhan.st(); }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function hms(ms){ var s=Math.floor(Math.max(0,ms)/1000); return pad2(Math.floor(s/3600))+':'+pad2(Math.floor(s%3600/60))+':'+pad2(s%60); }
+  var AD_ICON = {fajr:'Sunrise', dhuhr:'Sun', asr:'Clock', maghrib:'Sunset', isha:'Moon'};
+
+  function AdSwitch(p){ return h('button', {type:'button', role:'switch', 'aria-checked':!!p.on, 'aria-label':p.label, onClick:function(){ p.onChange(!p.on); }, className:'ad-sw focus-ring'}); }
+  function AdWave(p){ return h('span', {className:'ad-wave'+(p.on?' on':''), 'aria-hidden':'true'}, [0,1,2,3,4].map(function(i){ return h('i', {key:i}); })); }
+  function AdPlay(p){
+    var on = Adhan.st().playing === 'pv:'+p.kind+p.n;
+    return h('button', {type:'button', 'aria-label': on?'إيقاف المعاينة':'معاينة 5 ثوانٍ', onClick:function(e){ e.stopPropagation(); Adhan.preview(p.kind,p.n); }, className:'ad-play focus-ring'+(on?' on':'')},
+      on ? h(AdWave,{on:true}) : h(Icon,{name:'Play', size:14, filled:true}));
+  }
+  function AdSelect(p){
+    var n=p.n, opts=[]; if(p.zero) opts.push([0,p.zero]);
+    if(!n && !p.zero) opts.push([1,'لا توجد ملفات']); for(var i=1;i<=n;i++) opts.push([i,AD_DIRS[p.kind][2]+i]);
+    return h('div', {className:'flex items-center gap-2 min-w-0'},
+      h('select', {value:p.val, disabled:!n&&!p.zero, onChange:function(e){ p.onPick(+e.target.value); }, className:'ad-select focus-ring', 'aria-label':'اختيار الصوت'},
+        opts.map(function(o){ return h('option', {key:o[0], value:o[0]}, o[1]); })),
+      n ? h(AdPlay, {kind:p.kind, n:Math.min(p.val||p.fallback||1, n)}) : null);
+  }
+  function AdAlert(p){
+    var r=p.row;
+    return h('div', {className:'ad-row'},
+      h('div', {className:'flex items-center justify-between gap-3'},
+        h('span', {className:'text-[13.5px] font-extrabold'}, p.title), h(AdSwitch, {on:r.on, label:p.title, onChange:function(v){ p.set({on:v}); }})),
+      r.on ? h('div', {className:'mt-3 flex flex-wrap items-center gap-2 animate-fadeUp'},
+        p.mins ? p.mins.map(function(m){ return h('button', {key:m, type:'button', onClick:function(){ p.set({min:m}); }, className:'ad-chip focus-ring'+(r.min===m?' on':'')}, m+' د'); }) : null,
+        h(AdSelect, {kind:p.kind, n:Adhan.cat()[p.kind], val:r.sound, zero:p.zero, fallback:p.fallback, onPick:function(v){ p.set({sound:v}); }})) : null);
+  }
+  function AdPrayer(p){
+    var k=p.k, P=Adhan.get().prayers[k], t=Adhan.timesFor(new Date())[k], cur=formatPrayerClock(t.adj/60), org=formatPrayerClock(t.base/60), open=p.open;
+    function set(row,patch){ return function(x){ Adhan.save(function(s){ Object.assign(s.prayers[k][row], x); }); }; }
+    function nudge(d){ Adhan.save(function(s){ s.prayers[k].shift=Math.max(-30,Math.min(30,s.prayers[k].shift+d)); }); }
+    return h('div', {className:'ad-card overflow-hidden'},
+      h('button', {type:'button', 'aria-expanded':open, onClick:p.onToggle, className:'w-full flex items-center gap-3.5 px-4 sm:px-5 py-4 text-right focus-ring'},
+        h('span', {className:'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0', style:{background:'var(--color-brand-tint)', color:'var(--color-brand-deep)'}}, h(Icon,{name:AD_ICON[k], size:19})),
+        h('span', {className:'flex-1 min-w-0'},
+          h('span', {className:'block text-[15.5px] font-extrabold'}, PRAYER_LABELS[k]),
+          h('span', {className:'block text-[11.5px] text-inkfaint mt-0.5 num'}, 'الأصلي '+org.text+' '+org.period)),
+        h('span', {key:cur.text, className:'ad-tick text-[20px] font-extrabold num'}, cur.text, h('small', {className:'text-[11px] font-bold text-inkfaint mr-1'}, cur.period)),
+        h(Icon, {name:'ChevronDown', size:18, className:'text-inkfaint transition-smooth '+(open?'rotate-180':'')})),
+      h('div', {className:'grid-expand'+(open?' is-open':'')}, h('div', null,
+        h('div', {className:'px-4 sm:px-5 pb-5 space-y-3'},
+          h('div', {className:'ad-row flex items-center justify-between gap-3'},
+            h('div', null, h('p', {className:'text-[13.5px] font-extrabold'}, 'تقديم / تأخير'), h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, '+ تأخير · − تقديم')),
+            h('div', {className:'flex items-center gap-2', dir:'ltr'},
+              h('button', {type:'button', 'aria-label':'تقديم دقيقة', onClick:function(){ nudge(-1); }, className:'ad-step focus-ring'}, h(Icon,{name:'Minus', size:17})),
+              h('span', {key:P.shift, className:'ad-tick w-14 text-center text-[15px] font-extrabold num'}, (P.shift>0?'+':'')+P.shift+' د'),
+              h('button', {type:'button', 'aria-label':'تأخير دقيقة', onClick:function(){ nudge(1); }, className:'ad-step focus-ring'}, h(Icon,{name:'Plus', size:17})))),
+          h(AdAlert, {title:'قبل الأذان', kind:'before', row:P.before, mins:[5,10,15,20], set:set('before')}),
+          h(AdAlert, {title:'عند الأذان', kind:'adhan', row:P.adhan, zero:'المؤذن الافتراضي', fallback:Adhan.defaultSound(k), set:set('adhan')}),
+          h(AdAlert, {title:'بعد الأذان', kind:'after', row:P.after, mins:[10,15,20,30], set:set('after')}),
+          h('button', {type:'button', onClick:function(){ Adhan.copyFrom(k); p.toast.push({message:'نُسخت إعدادات '+PRAYER_LABELS[k]+' لباقي الصلوات', icon:'Layers'}); },
+            className:'w-full h-11 rounded-2xl border border-line text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-linesoft transition-smooth focus-ring'},
+            h(Icon,{name:'Layers', size:14}), 'نسخ الإعدادات لباقي الصلوات')))));
+  }
+  function AdFooter(){
+    var st=useAdhan(), n=useState(Date.now()), now=n[0], setNow=n[1];
+    useEffect(function(){ var t=setInterval(function(){ setNow(Date.now()); },1000); return function(){ clearInterval(t); }; }, []);
+    var nx=Adhan.next(now), KL={before:'قبل أذان ', adhan:'أذان ', after:'بعد أذان '};
+    function cell(label,val,sub){ return h('div', {className:'min-w-0'}, h('p', {className:'text-[10.5px] font-bold text-inkfaint'}, label), h('p', {className:'text-[13px] font-extrabold truncate'}, val), h('p', {className:'text-[12px] font-bold num', style:{color:'var(--color-brand-deep)'}}, sub)); }
+    var warn = st.hint || (st.blocked ? 'المتصفح منع الصوت — اضغط أي مكان لتفعيله' : '');
+    return h('div', {className:'sticky bottom-0 z-10 -mx-6 -mb-5 mt-5 px-6 pt-3 pb-4 bg-surface/90 backdrop-blur border-t border-line'},
+      warn ? h('div', {className:'mb-2.5 flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-bold animate-fadeUp', style:{background:'var(--pal-amber-tint)', color:'var(--pal-amber-text)'}}, h(Icon,{name:'Info', size:14}), h('span', {className:'min-w-0'}, warn)) : null,
+      h('div', {className:'flex items-center gap-4'},
+        h('div', {className:'flex-1 grid grid-cols-2 gap-3 min-w-0'},
+          nx.p ? cell('الصلاة القادمة', PRAYER_LABELS[nx.p.k], hms(nx.p.t-now)) : null,
+          cell('التنبيه القادم', nx.a ? KL[nx.a.kind]+PRAYER_LABELS[nx.a.k] : 'لا يوجد', nx.a ? hms(nx.a.t-now) : '—')),
+        h('div', {className:'flex flex-col items-end gap-1 shrink-0'},
+          h('button', {type:'button', onClick:function(){ if(window.confirm('استعادة إعدادات الأذان الافتراضية؟')) Adhan.reset(); }, className:'h-10 px-4 rounded-full border border-line text-[12.5px] font-bold flex items-center gap-1.5 hover:bg-linesoft transition-smooth focus-ring'}, h(Icon,{name:'RotateCcw', size:13}), 'استعادة الافتراضي'),
+          h('span', {className:'text-[10.5px] font-bold', style:{color: st.cloud==='ok' ? 'var(--pal-green-text)' : 'var(--color-inkfaint)'}}, st.cloud==='ok' ? '● متزامن مع السحابة' : st.cloud==='wait' ? '● بانتظار المزامنة' : '● محفوظ على هذا الجهاز'))));
+  }
+  function AdhanPanel(props){
+    var st=useAdhan(), toast=useToast(), S=Adhan.get(), cat=Adhan.cat(); useDstFlag();
+    var o=useState('dhuhr'), open=o[0], setOpen=o[1], last=useRef(st.saved);
+    useEffect(function(){ if(st.saved && st.saved!==last.current){ last.current=st.saved; toast.push({message:'تم الحفظ', icon:'CheckCircle2', duration:1400}); } });
+    useEffect(function(){ Adhan.scan(false); Adhan.pull(); return function(){ Adhan.stopPreview(); }; }, []);
+    function set(k,v){ Adhan.save(function(s){ s[k]=v; }); }
+    function sec(title,children){ return h('div', {className:'ad-card p-4 sm:p-5 space-y-3'}, h('h4', {className:'text-[12.5px] font-extrabold text-inksoft'}, title), children); }
+    function row(title,sub,ctrl){ return h('div', {className:'flex items-center justify-between gap-3'}, h('div', {className:'min-w-0'}, h('p', {className:'text-[14px] font-extrabold'}, title), sub ? h('p', {className:'text-[11.5px] text-inkfaint mt-0.5'}, sub) : null), ctrl); }
+    var vp=Math.round(S.volume*100);
+    return h(ModalShell, {title:'الأذان والتنبيهات', onClose:props.onClose, wide:true},
+      h('div', {className:'space-y-4'},
+        sec('عام', h('div', {className:'space-y-4'},
+          row('تفعيل الأذان','تشغيل التنبيهات والتاب مفتوح', h(AdSwitch, {on:S.enabled, label:'تفعيل الأذان', onChange:function(v){ set('enabled',v); }})),
+          row('الصوت', S.unlocked ? 'المتصفح سمح بتشغيل الصوت' : 'المتصفح يمنع الصوت التلقائي حتى تفعّله مرة',
+            S.unlocked ? h('span', {className:'h-10 px-4 rounded-full flex items-center text-[12.5px] font-extrabold', style:{background:'var(--pal-green-tint)', color:'var(--pal-green-text)'}}, '✓ الصوت مفعّل')
+              : h('button', {type:'button', onClick:function(){ Adhan.unlock(); }, className:'btn-primary h-10 px-5 rounded-full text-white text-[12.5px] font-bold active:scale-95 transition-smooth focus-ring'}, 'تفعيل الصوت')),
+          h('div', null,
+            h('div', {className:'flex items-center justify-between mb-2.5'}, h('span', {className:'text-[13px] font-extrabold'}, 'مستوى الصوت'),
+              h('div', {className:'flex items-center gap-2'}, h('span', {className:'text-[13px] font-extrabold num w-10 text-left'}, vp+'%'),
+                h('button', {type:'button', onClick:Adhan.test, className:'h-9 px-4 rounded-full border border-line text-[12.5px] font-bold flex items-center gap-1.5 hover:bg-linesoft transition-smooth focus-ring'},
+                  st.playing==='pv:test' ? h(AdWave,{on:true}) : h(Icon,{name:'Play', size:12, filled:true}), 'تجربة'))),
+            h('input', {type:'range', min:0, max:100, value:vp, 'aria-label':'مستوى الصوت', className:'ad-range', style:{'--p':vp+'%'}, onChange:function(e){ set('volume', +e.target.value/100); }})),
+          row('بداية تدريجية للأذان','يرتفع الصوت بهدوء في أول ثوانٍ', h(AdSwitch, {on:S.fade, label:'بداية تدريجية', onChange:function(v){ set('fade',v); }})))),
+        sec('المؤذن', h('div', {className:'space-y-3'},
+          cat.adhan ? h('div', {className:'grid grid-cols-2 sm:grid-cols-3 gap-2.5'}, Array.from({length:cat.adhan}, function(_,i){ var n=i+1;
+            return h('div', {key:n, role:'radio', 'aria-checked':S.adhan===n, tabIndex:0, onClick:function(){ set('adhan',n); }, onKeyDown:function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); set('adhan',n); } },
+              className:'ad-voice focus-ring cursor-pointer'+(S.adhan===n?' sel':'')},
+              h('span', {className:'flex items-center gap-1.5 text-[13px] font-extrabold'}, S.adhan===n ? h(Icon,{name:'Check', size:14, strokeWidth:2.6}) : null, 'مؤذن '+n), h(AdPlay, {kind:'adhan', n:n})); }))
+            : h('p', {className:'text-[12.5px] text-inkfaint leading-relaxed'}, cat.busy ? 'جارٍ فحص ملفات الأذان…' : 'لا توجد ملفات بعد. ضع الأذان في audio/adhan/1.mp3 ثم 2.mp3 … وستظهر هنا تلقائيًا.'),
+          cat.adhan ? row('مؤذن الفجر','اختياري — يستخدم الافتراضي لو تُرك', h(AdSelect, {kind:'adhan', n:cat.adhan, val:S.fajrAdhan, zero:'نفس الافتراضي', fallback:S.adhan, onPick:function(v){ set('fajrAdhan',v); }})) : null,
+          h('div', {className:'flex items-center justify-between gap-3 pt-1'},
+            h('span', {className:'text-[11.5px] text-inkfaint num'}, 'ملفات: '+cat.adhan+' مؤذن · '+cat.before+' قبل · '+cat.after+' بعد'),
+            h('button', {type:'button', onClick:function(){ Adhan.scan(true); }, className:'text-[12px] font-bold text-inksoft hover:text-ink transition-smooth focus-ring rounded-full px-2 h-8'}, cat.busy?'جارٍ الفحص…':'إعادة الفحص')))),
+        h('div', {className:'space-y-3'}, ADHAN_KEYS.map(function(k){ return h(AdPrayer, {key:k, k:k, open:open===k, toast:toast, onToggle:function(){ setOpen(open===k?null:k); }}); })),
+        h(AdFooter, null)));
   }
 
   function MaghribCountdown(){
@@ -4746,7 +5026,7 @@
     var s = useState(loadState()); var state=s[0], setState=s[1];
     var vs = useState('today'); var view=vs[0], setView=vs[1];
     var mh = useState(null); var modalHabit=mh[0], setModalHabit=mh[1];
-    var ss = useState(false); var showSettings=ss[0], setShowSettings=ss[1];
+    var ss = useState(false); var showSettings=ss[0], setShowSettings=ss[1]; var ad_ = useState(false); var showAdhan=ad_[0], setShowAdhan=ad_[1];
     var ds = useState(null); var deleteTarget=ds[0], setDeleteTarget=ds[1];
     var pzs = useState(null); var pauseTarget=pzs[0], setPauseTarget=pzs[1];
     var fs = useState('all'); var filter=fs[0], setFilter=fs[1];
@@ -5100,7 +5380,7 @@
     /* ===== Command palette + global shortcuts ===== */
     var cps = useState(false); var showPalette=cps[0], setShowPalette=cps[1];
     var shs = useState(false); var showShortcuts=shs[0], setShowShortcuts=shs[1];
-    var overlayOpen = !!(modalHabit || showSettings || deleteTarget || pauseTarget || showPalette || showShortcuts);
+    var overlayOpen = !!(modalHabit || showSettings || showAdhan || deleteTarget || pauseTarget || showPalette || showShortcuts);
     var kbdRef = useRef({});
     kbdRef.current = {overlayOpen:overlayOpen, tasksModule:tasksModule};
 
@@ -5164,7 +5444,7 @@
 
     return h(Fragment, null,
       h('div', {className:'min-h-screen flex flex-col'},
-        h(TopBar, {view:view, setView:setView, addLabel: view==='tasks' ? 'مهمة جديدة' : null, onAdd:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, onSettings:function(){ setShowSettings(true); }}),
+        h(TopBar, {view:view, setView:setView, addLabel: view==='tasks' ? 'مهمة جديدة' : null, onAdd:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, onSettings:function(){ setShowSettings(true); }, onAdhan:function(){ setShowAdhan(true); }}),
         view==='today' ? h('div', {key:'hero-today', className:'view-enter'}, h(MaghribCountdown, null), h(HeroToday, {habits:state.habits, progress:state.progress})) : null,
         h('div', {className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'},
           view==='today' ? tasksModule.sidebarActive : null,
@@ -5193,6 +5473,7 @@
           h(Icon,{name:'Plus', size:16, strokeWidth:2.4}), h('span',{className:'text-[13.5px] font-bold'}, view==='tasks' ? 'مهمة جديدة' : 'عادة جديدة'))),
       tasksModule.overlays,
       modalHabit ? h(HabitEditorModal, {initial:modalHabit, categories:state.categories, periods:state.periods, priorities:state.priorities, onCreatePriority:createPriority, onCreatePeriod:createPeriod, onCreateCategory:createCategory, onClose:function(){ setModalHabit(null); }, onSave:saveHabit, onRequestDelete:function(hb){ setDeleteTarget(hb); }}) : null,
+      showAdhan ? h(AdhanPanel, {onClose:function(){ setShowAdhan(false); }}) : null,
       showSettings ? h(SettingsModal, {periods:state.periods, onCreatePeriod:createPeriod, onRenamePeriod:renamePeriod, onStylePeriod:function(id,p){ styleListItem('periods', id, p); }, onDeletePeriod:deletePeriod, onReorderPeriod:reorderPeriod,
         priorities:state.priorities, onCreatePriority:createPriority, onRenamePriority:renamePriority, onStylePriority:function(id,p){ styleListItem('priorities', id, p); }, onDeletePriority:deletePriority, onReorderPriority:reorderPriority,
         onStyleCategory:function(id,p){ styleListItem('categories', id, p); }, categories:state.categories, habits:state.habits, onCreateCategory:createCategory, onRenameCategory:renameCategory, onDeleteCategory:deleteCategory, onReorderCategory:reorderCategory,
