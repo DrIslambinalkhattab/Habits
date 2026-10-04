@@ -1917,7 +1917,11 @@
     /* نفس اتصال ومفاتيح جسر Supabase أعلاه — لو غيّرتهما هناك غيّرهما هنا */
     var SB_URL='https://xgjkmbcvyxxlqxnckhhi.supabase.co', SB_KEY='sb_publishable_j-Jkn57NUHt9N1Gr_uUiMg_e03BOga3';
     var LSK='adhan.settings.v1', CK='adhan.catalog.v1', FK='adhan.fired.v1', AUTHK='athar.auth.v1';
-    var SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+    var SILENT=(function(){ var n=1600, b=new Uint8Array(44+n), dv=new DataView(b.buffer), i, bin='';
+      function w(o,s){ for(var j=0;j<s.length;j++) b[o+j]=s.charCodeAt(j); }
+      w(0,'RIFF'); dv.setUint32(4,36+n,true); w(8,'WAVEfmt '); dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+      dv.setUint32(24,8000,true); dv.setUint32(28,8000,true); dv.setUint16(32,1,true); dv.setUint16(34,8,true); w(36,'data'); dv.setUint32(40,n,true);
+      for(i=44;i<b.length;i++) b[i]=128; for(i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return 'data:audio/wav;base64,'+btoa(bin); })();
     var subs=[], st={playing:null, blocked:false, hint:'', cloud:'idle', saved:0}, cat={adhan:0,before:0,after:0,ts:0,busy:false};
     var au=new Audio(), fadeT=null, stopT=null, pending=null, primed=false, boot=Date.now(), tSave=null, tPush=null, tRetry=null;
     function defaults(){ var p={}; ADHAN_KEYS.forEach(function(k){ p[k]={shift:0, before:{on:false,min:10,sound:1}, adhan:{on:true,sound:0}, after:{on:false,min:15,sound:1}}; });
@@ -1970,8 +1974,12 @@
       if(o.limit) stopT=setTimeout(end,o.limit);
       return true;
     }
-    function prime(){ au.src=SILENT; au.volume=0;
-      return Promise.resolve(au.play()).then(function(){ au.pause(); primed=true; st.blocked=false; var q=pending; pending=null; if(q&&Date.now()<q.until) play(q.kind,q.n,q.o); else emit(); }); }
+    var primeP=null;
+    function prime(){ if(primeP) return primeP; au.src=SILENT; au.volume=0;
+      primeP=Promise.resolve(au.play()).then(function(){ au.pause(); }).catch(function(e){ if(e&&e.name==='NotAllowedError') throw e; })
+        .then(function(){ primeP=null; primed=true; st.blocked=false; st.hint=''; var q=pending; pending=null; if(q&&Date.now()<q.until) play(q.kind,q.n,q.o); else emit(); },
+          function(e){ primeP=null; throw e; });
+      return primeP; }
     function unlock(){ return prime().then(function(){ save(function(s){ s.unlocked=true; }); }).catch(function(){ hint('تعذّر تفعيل الصوت على هذا المتصفح'); }); }
     window.addEventListener('pointerdown',function(){ if(primed||st.playing) return; prime().catch(function(){}); },true);
     function preview(kind,n){
