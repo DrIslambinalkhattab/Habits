@@ -238,6 +238,16 @@
   .hero-tile:hover::before { opacity:.24; transform: scale(1.15); }
   .hero-tile-ico { transition: transform .35s cubic-bezier(.2,.8,.2,1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 4px 10px -6px var(--tile-glow, rgba(0,0,0,.3)); }
   .hero-tile:hover .hero-tile-ico { transform: scale(1.08) rotate(-4deg); }
+  .hero-meter { margin-top:7px; }
+  .hero-meter-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .hero-meter-lbl { display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; color:var(--color-inkfaint); letter-spacing:.01em; }
+  .hero-meter-val { direction:ltr; display:inline-flex; align-items:baseline; gap:1px; font-size:11.5px; font-weight:700; color:var(--color-inkfaint); font-variant-numeric:tabular-nums; }
+  .hero-meter-val b { font-size:12.5px; font-weight:800; color:var(--color-ink); }
+  .hero-meter-val i { font-style:normal; opacity:.55; margin:0 1px; }
+  .hero-meter-track { margin-top:5px; height:4px; border-radius:9999px; background:var(--color-linesoft); box-shadow:inset 0 1px 1px rgba(22,33,44,.06); overflow:hidden; }
+  .hero-meter-fill { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg, var(--color-brand), var(--color-brand-deep)); transition:width .7s cubic-bezier(.2,.8,.2,1), filter .3s; }
+  .hero-meter-fill.is-full { background:linear-gradient(90deg,#22c55e,#16a34a); }
+  @media (prefers-reduced-motion: reduce){ .hero-meter-fill{ transition:none } }
   /* ---- Date chip + perfect badge ---- */
   .hero-date-chip { display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 14px 0 12px; border-radius:9999px;
     background: var(--color-surface); border:1px solid var(--color-line); color: var(--color-inksoft);
@@ -1182,6 +1192,8 @@
     if(habit.subtasks && habit.subtasks.length){
       var live = activeSubsOn(habit, key || todayKeyFn());
       if(!live.length) return false;
+      /* إتمام يدوي: العادة تُعدّ مكتملة بقرارك حتى لو لم تُنجَز كل المهام الفرعية */
+      if(entry.manualDone) return true;
       return live.every(function(s){ return entry.subDone && entry.subDone.indexOf(s.id) > -1; });
     }
     return !!entry.manualDone;
@@ -2439,7 +2451,13 @@
         h('div', {className:'text-[11.5px] text-inksoft font-bold truncate'}, props.label),
         h('div', {className:'mt-1 flex items-baseline gap-1.5'},
           h('span', {className:'text-[22px] leading-none font-extrabold num tracking-tight text-ink'}, props.value),
-          props.suffix ? h('span', {className:'text-[12px] font-bold text-inkfaint'}, props.suffix) : null)));
+          props.suffix ? h('span', {className:'text-[12px] font-bold text-inkfaint'}, props.suffix) : null),
+        props.meter && props.meter.total>0 ? h('div', {className:'hero-meter', title:'المهام الفرعية المنجزة اليوم', 'aria-label':'المهام الفرعية: '+props.meter.done+' من '+props.meter.total},
+          h('div', {className:'hero-meter-row'},
+            h('span', {className:'hero-meter-lbl'}, h(Icon,{name:'ListChecks', size:11, strokeWidth:2.2}), 'مهام فرعية'),
+            h('span', {className:'hero-meter-val num'}, h('b', null, props.meter.done), h('i', null, '/'), props.meter.total)),
+          h('div', {className:'hero-meter-track', 'aria-hidden':'true'},
+            h('span', {className:'hero-meter-fill'+(props.meter.done===props.meter.total?' is-full':''), style:{width:Math.round(props.meter.done/props.meter.total*100)+'%'}}))) : null));
   }
 
   function HeroToday(props){
@@ -2452,6 +2470,12 @@
     var total = liveHabits.length;
     var pct = total ? Math.round((done/total)*100) : 0;
     var bestStreak = habits.reduce(function(m,hb){ return Math.max(m, computeCurrentStreak(hb,progress)); }, 0);
+    var subTotal = 0, subDoneN = 0;
+    liveHabits.forEach(function(hb){
+      if(!hb.subtasks || !hb.subtasks.length) return;
+      subTotal += activeSubsOn(hb, tKey).length;
+      subDoneN += subDoneCountFor(hb, progress[tKey] && progress[tKey][hb.id], tKey);
+    });
     var now = new Date();
     var monthKey = tKey.slice(0,7);
     var perfectDays = 0, cursor = monthKey+'-01';
@@ -2544,7 +2568,7 @@
           h('div', {className:'lg:w-[236px] shrink-0 lg:justify-self-end grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5'},
             h(StatTile, {icon:'Flame', label:'أفضل سلسلة نشطة', value:bestStreak, suffix:'يوم', tone:'amber', style:stagger(4)}),
             h(StatTile, {icon:'Award', label:'أيام مثالية هذا الشهر', value:perfectDays, suffix:'يوم', tone:'sky', style:stagger(5)}),
-            h(StatTile, {icon:'ListChecks', label:'إجمالي العادات', value:habits.length, suffix:(pausedCount ? 'عادة · '+pausedCount+' موقوفة' : 'عادة'), tone:'slate', style:stagger(6)})))));
+            h(StatTile, {icon:'ListChecks', label:'إجمالي العادات', value:habits.length, suffix:(pausedCount ? 'عادة · '+pausedCount+' موقوفة' : 'عادة'), tone:'slate', meter:{done:subDoneN, total:subTotal}, style:stagger(6)})))));
   }
 
   /* ================= TOOLBAR + EMPTY STATE ================= */
@@ -2667,8 +2691,9 @@
     var paused = isHabitPausedOn(habit, tk);
     var isDone = !paused && isHabitDoneOnDate(habit, entry);
     var doneCount = subDoneCountFor(habit, entry);
-    var pct = paused ? 0 : hasSubs ? Math.round((doneCount/liveCount)*100) : (isDone?100:0);
-    var subLabel = paused ? (pRange ? pauseLabel(pRange) : 'كل المهام الفرعية موقوفة') : hasSubs ? (doneCount+' من '+liveCount+' مهام فرعية'+(pausedSubs ? ' · '+pausedSubs+' موقوفة' : '')) : 'عادة بسيطة';
+    var manualPartial = hasSubs && isDone && doneCount < liveCount;
+    var pct = paused ? 0 : hasSubs ? (isDone ? 100 : Math.round((doneCount/liveCount)*100)) : (isDone?100:0);
+    var subLabel = paused ? (pRange ? pauseLabel(pRange) : 'كل المهام الفرعية موقوفة') : hasSubs ? (doneCount+' من '+liveCount+' مهام فرعية'+(manualPartial ? ' · أُتمّت' : '')+(pausedSubs ? ' · '+pausedSubs+' موقوفة' : '')) : 'عادة بسيطة';
     function resumeBtn(compact){
       return h('button', {onClick:function(e){ e.stopPropagation(); props.onResume(habit.id, null); }, 'aria-label':'استئناف '+habit.name, title:'استئناف',
         className:(compact ? 'w-7 h-7 justify-center' : 'h-7 px-2.5 gap-1')+' rounded-full flex items-center text-[11.5px] font-bold transition-smooth focus-ring shrink-0',
@@ -2689,11 +2714,9 @@
     }, [isDone]);
     function handleToggleWhole(e){
       e.stopPropagation();
-      /* إكمال جزئي: لا نُكمل الباقي تلقائيًا، نفتح المهام الفرعية لتأكيدها بنفسك */
+      /* إتمام جزئي: العادة تتم بقرارك، والمهام الفرعية المتبقية تبقى كما هي دون تعليمها */
       if(hasSubs && !isDone && doneCount>0 && doneCount<liveCount){
-        setExpanded(true);
-        toastApi.push({message:'باقي '+(liveCount-doneCount)+' من المهام الفرعية — أكملها لتتم العادة', icon:'ListChecks'});
-        return;
+        toastApi.push({message:'تمّت العادة بإنجاز '+doneCount+' من '+liveCount+' مهام فرعية', icon:'ListChecks'});
       }
       props.onToggleWhole(habit.id);
     }
@@ -5284,9 +5307,15 @@
           var live = activeSubsOn(habit, todayKeyVal);
           if(!live.length) return entry;
           var liveIds = live.map(function(st){ return st.id; });
-          var allDone = live.every(function(st){ return entry.subDone.indexOf(st.id)>-1; });
+          var doneLive = live.filter(function(st){ return entry.subDone.indexOf(st.id)>-1; }).length;
+          var allDone = doneLive === live.length;
           var others = entry.subDone.filter(function(id){ return liveIds.indexOf(id)===-1; });
-          return Object.assign({}, entry, {subDone: allDone ? others : others.concat(liveIds)});
+          /* إلغاء الإتمام: نزيل علامة الإتمام اليدوي، ونُبقي المهام الفرعية كما هي إلا لو كانت كلها منجزة */
+          if(entry.manualDone || allDone) return Object.assign({}, entry, {manualDone:false, subDone: allDone ? others : entry.subDone});
+          /* إتمام جزئي: نعلّم العادة دون لمس المهام المتبقية */
+          if(doneLive > 0) return Object.assign({}, entry, {manualDone:true});
+          /* لا شيء منجز: إتمام سريع لكل المهام */
+          return Object.assign({}, entry, {subDone: others.concat(liveIds)});
         }
         return Object.assign({}, entry, {manualDone: !entry.manualDone});
       });
