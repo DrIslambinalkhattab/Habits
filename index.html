@@ -447,6 +447,7 @@
   /* View transition (today / overview) */
   @keyframes viewIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
   .view-enter { animation: viewIn .22s cubic-bezier(.2,.8,.2,1) both; }
+  .view-enter.is-hisn { animation-fill-mode: backwards; } /* no lingering transform → iframe reader stays viewport-fixed */
   @media (prefers-reduced-motion: reduce) { .view-enter { animation: none !important; } }
   /* ===== History tab (hr-*) ===== */
   .hr-card{border:1px solid var(--color-line);background:linear-gradient(180deg,var(--color-surface),var(--color-raised));border-radius:22px;box-shadow:0 1px 2px rgba(22,33,44,.03),0 10px 26px -16px rgba(22,33,44,.18)}
@@ -5032,22 +5033,42 @@
   var HISN_SRC = 'hisn.html';
   function HisnView(){
     var ls = useState(true), loading = ls[0], setLoading = ls[1];
+    var hs = useState(640), height = hs[0], setHeight = hs[1];
+    var rs = useState(false), reading = rs[0], setReading = rs[1];
     var ref = useRef(null);
-    function syncTheme(){
-      try{ var d = ref.current && ref.current.contentDocument; if(d && d.documentElement) d.documentElement.setAttribute('data-theme', currentTheme()); }catch(e){}
+    function doc(){ try{ return ref.current && ref.current.contentDocument; }catch(e){ return null; } }
+    function syncTheme(){ var d = doc(); if(d && d.documentElement) d.documentElement.setAttribute('data-theme', currentTheme()); }
+    function measure(){
+      var d = doc(); if(!d || !d.body) return;
+      var hh = Math.ceil(d.body.getBoundingClientRect().height);
+      if(hh > 0) setHeight(function(p){ return Math.abs(p-hh) > 1 ? hh : p; });
+    }
+    function onLoad(){
+      var d = doc(); if(!d) { setLoading(false); return; }
+      var st = d.createElement('style');
+      st.textContent = 'html,body{height:auto!important;min-height:0!important;overflow-y:hidden!important}#reader{overscroll-behavior:auto}';
+      d.head.appendChild(st);
+      syncTheme(); measure();
+      if(window.ResizeObserver){ new ResizeObserver(measure).observe(d.body); }
+      var rd = d.getElementById('reader');
+      if(rd){ new MutationObserver(function(){ setReading(rd.classList.contains('open')); }).observe(rd, {attributes:true, attributeFilter:['class']}); }
+      if(d.fonts && d.fonts.ready) d.fonts.ready.then(measure);
+      setLoading(false);
     }
     useEffect(function(){
       var mo = new MutationObserver(syncTheme);
       mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
-      return function(){ mo.disconnect(); };
+      window.addEventListener('resize', measure);
+      return function(){ mo.disconnect(); window.removeEventListener('resize', measure); };
     }, []);
-    return h('div', {className:'relative w-full rounded-[22px] overflow-hidden border border-line bg-surface shadow-premium', style:{height:'calc(100vh - 68px - 56px - env(safe-area-inset-top,0px))', minHeight:'520px'}},
+    return h('div', {className:'relative', style:{height:height+'px', width:'100vw', marginInline:'calc(50% - 50vw)', marginTop:'-24px', marginBottom:'-96px', minHeight:'60vh'}},
       loading ? h('div', {className:'absolute inset-0 flex flex-col items-center justify-center gap-3 text-inksoft', 'aria-live':'polite'},
         h(Icon, {name:'BookOpen', size:26, strokeWidth:1.6}),
         h('span', {className:'text-[13px] font-bold'}, 'جارٍ تحميل حصن المسلم…')) : null,
-      h('iframe', {ref:ref, src:HISN_SRC, title:'حصن المسلم', loading:'lazy',
-        onLoad:function(){ syncTheme(); setLoading(false); },
-        style:{width:'100%', height:'100%', border:0, display:'block', opacity:loading?0:1, transition:'opacity .35s ease'}}));
+      h('iframe', {ref:ref, src:HISN_SRC, title:'حصن المسلم', scrolling:'no', onLoad:onLoad,
+        style: reading
+          ? {position:'fixed', inset:0, width:'100%', height:'100%', border:0, zIndex:60, display:'block'}
+          : {width:'100%', height:'100%', border:0, display:'block', opacity:loading?0:1, transition:'opacity .35s ease'}}));
   }
 
   /* ================= HISTORY VIEW (السجل) ================= */
@@ -5691,7 +5712,7 @@
         view==='today' ? h('div', {key:'hero-today', className:'view-enter'}, h(MaghribCountdown, null), h(HeroToday, {habits:state.habits, progress:state.progress})) : null,
         h('div', {className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'},
           view==='today' ? tasksModule.sidebarActive : null,
-          h('main', {key:view, className:'view-enter min-w-0 flex-1 app-main'+(view==='overview'?' is-overview':'')},
+          h('main', {key:view, className:'view-enter min-w-0 flex-1 app-main'+(view==='overview'?' is-overview':'')+(view==='hisn'?' is-hisn':'')},
             view==='today' ? h(Fragment, null,
               h(Toolbar, {query:query, setQuery:setQuery, filter:filter, setFilter:setFilter, searchRef:searchRef, groupMode:groupMode, onGroupMode:switchGroupMode}),
               h(HabitTable, {
