@@ -1869,7 +1869,7 @@
         h('div', {className:'flex items-center gap-2.5 shrink-0 justify-self-start'},
           h('div', {className:'w-9 h-9 rounded-[10px] flex items-center justify-center text-white shrink-0 shadow-[0_2px_6px_-1px_rgba(46,110,147,0.5)]', style:{background:'var(--grad-brand)'}}, h(Icon,{name:'Target', size:16, strokeWidth:2})),
           h('span', {className:'hidden sm:inline text-[17px] font-extrabold tracking-tightish'}, 'أثر')),
-        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'},{key:'history',label:'السجل'},{key:'hisn',label:'حصن المسلم'}], value:props.view, onChange:props.setView})),
+        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'},{key:'history',label:'السجل'},{key:'hisn',label:'حصن المسلم'},{key:'pomodoro',label:'بومودورو'}], value:props.view, onChange:props.setView})),
         h('div', {className:'flex items-center gap-2 shrink-0 justify-self-end'},
           h('button', {onClick:function(){ setSfxOn(SFX.toggle()); }, 'aria-label':sfxOn?'كتم أصوات الإنجاز':'تشغيل أصوات الإنجاز', 'aria-pressed':sfxOn, title:sfxOn?'الصوت: مفعّل':'الصوت: مكتوم',
             className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
@@ -5120,6 +5120,35 @@
         style:{width:'100%', height:'100%', border:0, display:'block', opacity:loading?0:1, transition:'opacity .35s ease'}}));
   }
 
+  /* ================= POMODORO VIEW (بومودورو) ================= */
+  var POMO_SRC = 'pomodoro.html';
+  function PomodoroView(){
+    var ls = useState(true), loading = ls[0], setLoading = ls[1];
+    var ref = useRef(null);
+    function doc(){ try{ return ref.current && ref.current.contentDocument; }catch(e){ return null; } }
+    function syncTheme(){ var d = doc(); if(d && d.documentElement) d.documentElement.setAttribute('data-theme', currentTheme()); }
+    function onLoad(){
+      var d = doc();
+      if(d && d.head && !d.getElementById('embed-tune')){
+        var st = d.createElement('style'); st.id = 'embed-tune';
+        st.textContent = '#th{display:none!important}.app{padding-top:18px}';
+        d.head.appendChild(st);
+      }
+      syncTheme(); setLoading(false);
+    }
+    useEffect(function(){
+      var mo = new MutationObserver(syncTheme);
+      mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+      return function(){ mo.disconnect(); };
+    }, []);
+    return h('div', {className:'hisn-frame'},
+      loading ? h('div', {className:'absolute inset-0 flex flex-col items-center justify-center gap-3 text-inksoft', 'aria-live':'polite'},
+        h(Icon, {name:'Timer', size:26, strokeWidth:1.6}),
+        h('span', {className:'text-[13px] font-bold'}, 'جارٍ تحميل البومودورو…')) : null,
+      h('iframe', {ref:ref, src:POMO_SRC, title:'بومودورو', onLoad:onLoad,
+        style:{width:'100%', height:'100%', border:0, display:'block', opacity:loading?0:1, transition:'opacity .35s ease'}}));
+  }
+
   /* ================= HISTORY VIEW (السجل) ================= */
   var HR_WD = ['سبت','أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة'];
   function hrTone(r){ return r===null ? 'slate' : r>=1 ? 'green' : r>=0.6 ? 'sky' : r>=0.3 ? 'amber' : 'rose'; }
@@ -5705,6 +5734,7 @@
       {id:'nav-today', group:'nav', label:'اليوم', icon:'CalendarDays', kbd:['1'], keywords:'home today الرئيسية', run:function(){ setView('today'); }},
       {id:'nav-overview', group:'nav', label:'نظرة عامة', icon:'BarChart3', kbd:['2'], keywords:'الإحصائيات overview stats', run:function(){ setView('overview'); }},
       {id:'nav-hisn', group:'nav', label:'حصن المسلم', icon:'BookOpen', kbd:['5'], keywords:'حصن المسلم اذكار أدعية hisn azkar dua', run:function(){ setView('hisn'); }},
+      {id:'nav-pomodoro', group:'nav', label:'بومودورو', icon:'Timer', kbd:['6'], keywords:'بومودورو pomodoro timer مؤقت تركيز وقتي', run:function(){ setView('pomodoro'); }},
       {id:'nav-history', group:'nav', label:'السجل', icon:'Clock', kbd:['4'], keywords:'history log سجل الأيام السابقة', run:function(){ setView('history'); }},
       {id:'nav-tasks', group:'nav', label:'تبويب المهام', icon:'ListChecks', kbd:['3'], keywords:'tasks urgent العاجلة المهام', run:goTasks},
       {id:'act-habit', group:'act', label:'عادة جديدة', icon:'Plus', kbd:['N'], keywords:'add new habit إضافة', run:function(){ setModalHabit({}); }},
@@ -5745,6 +5775,7 @@
         else if(k==='2'){ e.preventDefault(); setView('overview'); }
         else if(k==='4'){ e.preventDefault(); setView('history'); }
         else if(k==='5' || k==='٥'){ e.preventDefault(); setView('hisn'); }
+        else if(k==='6' || k==='٦'){ e.preventDefault(); setView('pomodoro'); }
         else if(k==='3'){ e.preventDefault(); goTasksRef.current(); }
         else if(k==='d' || k==='D' || k==='ي'){ e.preventDefault(); toggleThemeRef.current(); }
         else if(k==='?' || k==='؟'){ e.preventDefault(); setShowShortcuts(true); }
@@ -5761,7 +5792,7 @@
         view==='today' ? h('div', {key:'hero-today', className:'view-enter'}, h(MaghribCountdown, null), h(HeroToday, {habits:state.habits, progress:state.progress})) : null,
         h('div', {className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'},
           view==='today' ? tasksModule.sidebarActive : null,
-          h('main', {key:view, className:'view-enter min-w-0 flex-1 app-main'+(view==='overview'?' is-overview':'')+(view==='hisn'?' is-hisn':'')},
+          h('main', {key:view, className:'view-enter min-w-0 flex-1 app-main'+(view==='overview'?' is-overview':'')+((view==='hisn'||view==='pomodoro')?' is-hisn':'')},
             view==='today' ? h(Fragment, null,
               h(Toolbar, {query:query, setQuery:setQuery, filter:filter, setFilter:setFilter, searchRef:searchRef, groupMode:groupMode, onGroupMode:switchGroupMode}),
               h(HabitTable, {
@@ -5781,6 +5812,7 @@
             view==='tasks' ? h(TasksView, tasksModule.shared) : null,
             view==='overview' ? h(OverviewView, {habits:state.habits, progress:state.progress, categories:state.categories, periods:state.periods, priorities:state.priorities, onAdd:function(){ setModalHabit({}); }}) : null,
             view==='hisn' ? h(HisnView, null) : null,
+            view==='pomodoro' ? h(PomodoroView, null) : null,
             view==='history' ? h(HistoryView, {habits:state.habits, progress:state.progress, categories:state.categories, tasks:tasksModule.items, taskGroups:tasksModule.categories}) : null),
           view==='today' ? tasksModule.sidebarArchive : null),
         h('button', {onClick:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, className:'md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white shadow-raised active:scale-95 transition-smooth'},
