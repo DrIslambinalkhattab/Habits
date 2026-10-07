@@ -195,7 +195,7 @@
   .kb-count { min-width:24px; height:22px; padding:0 7px; border-radius:9999px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
   .kb-col-prog { height:3px; margin:0 14px 4px; border-radius:9999px; overflow:hidden; background:color-mix(in srgb, var(--col-dot,var(--color-brand)) 14%, transparent); }
   .kb-col-prog > span { display:block; height:100%; border-radius:inherit; transition:width .5s cubic-bezier(.2,.8,.2,1); }
-  .kb-col-body { display:flex; flex-direction:column; gap:10px; padding:10px 10px 12px; max-height:min(68vh,720px); overflow-y:auto; }
+  .kb-col-body { display:flex; flex-direction:column; gap:10px; padding:10px 10px 14px; max-height:none; overflow:visible; }
   .kb-card { background:var(--color-surface); border:1px solid var(--color-line); border-radius:16px; box-shadow:0 1px 2px rgba(15,23,42,.04); cursor:grab; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease; }
   .kb-card:hover { transform:translateY(-1px); border-color:color-mix(in srgb, var(--color-brand) 28%, var(--color-line)); box-shadow:0 12px 26px -14px rgba(15,23,42,.2); }
   .kb-card:active { cursor:grabbing; }
@@ -281,6 +281,20 @@
   .task-check .habit-pop-ring { border-radius:8px; }
   .task-title { text-decoration-line:line-through; text-decoration-thickness:1.5px; text-decoration-color:transparent; transition: color .28s cubic-bezier(.2,.8,.2,1), text-decoration-color .28s cubic-bezier(.2,.8,.2,1); }
   .task-section { transition: background-color .18s ease, box-shadow .18s ease; }
+  /* ---- Wishlist (parking lot for tasks) ---- */
+  .tasks-stack{ scrollbar-width:none; -ms-overflow-style:none; }
+  .tasks-stack::-webkit-scrollbar{ display:none; }
+  .wl-card{ position:relative; background:var(--color-surface); border:1px solid var(--color-line); border-radius:22px; box-shadow:var(--shadow-soft, 0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05)); transition:border-color .25s ease, box-shadow .25s ease, background .25s ease; }
+  .wl-card::before{ content:''; position:absolute; inset:0 0 auto 0; height:1px; border-radius:22px 22px 0 0; background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pal-amber-dot) 55%,transparent),transparent); opacity:.7; pointer-events:none; }
+  .wl-card.is-task-over{ border-color:color-mix(in srgb,var(--pal-amber-dot) 60%,transparent); background:color-mix(in srgb,var(--pal-amber-dot) 5%,var(--color-surface)); box-shadow:0 0 0 3px color-mix(in srgb,var(--pal-amber-dot) 14%,transparent), 0 10px 30px rgba(15,23,42,.08); }
+  .wl-badge{ min-width:22px; height:20px; padding:0 7px; border-radius:999px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; background:var(--pal-amber-tint); color:var(--pal-amber-text); }
+  .wl-scroll{ max-height:340px; overflow-y:auto; overscroll-behavior:contain; padding:2px 2px 4px; margin:0 -2px; scrollbar-width:thin; scrollbar-color:var(--color-line) transparent; -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 18px),transparent); mask-image:linear-gradient(to bottom,#000 calc(100% - 18px),transparent); }
+  .wl-scroll::-webkit-scrollbar{ width:4px } .wl-scroll::-webkit-scrollbar-thumb{ background:var(--color-line); border-radius:4px }
+  .wl-empty{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; padding:18px 14px; border:1.5px dashed var(--color-line); border-radius:16px; color:var(--color-inkfaint); transition:border-color .25s ease, background .25s ease, transform .25s ease; }
+  .wl-card.is-task-over .wl-empty{ border-color:var(--pal-amber-dot); background:var(--pal-amber-tint); transform:scale(.99); }
+  .wl-ico{ width:32px; height:32px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; background:linear-gradient(135deg,#f6b64a,#e08a1e); box-shadow:0 4px 12px -2px color-mix(in srgb,#e08a1e 45%,transparent); }
+  .wl-add{ display:flex; align-items:center; gap:4px; height:32px; padding:0 12px; border-radius:999px; font-size:12px; font-weight:700; color:var(--pal-amber-text); background:var(--pal-amber-tint); border:1px solid var(--pal-amber-line); transition:transform .15s ease, filter .2s ease; }
+  .wl-add:hover{ filter:brightness(.97) } .wl-add:active{ transform:scale(.95) }
   .task-section.is-task-over { background: color-mix(in srgb, var(--color-brand) 6%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-brand) 45%, transparent); }
   .task-title.is-struck { text-decoration-color: var(--color-inkfaint); }
   .task-row-pulse { position:absolute; inset:-1px; border-radius:16px; border:2px solid var(--pop-color,var(--color-brand)); pointer-events:none; animation: taskRowPulse .9s cubic-bezier(.3,.7,.3,1) forwards; }
@@ -4292,8 +4306,10 @@
             cat ? h('span', {className:'inline-flex items-center gap-1 text-[10.5px] font-bold px-1.5 py-0.5 rounded-full shrink-0', style:{background:PALETTE[cat.color].tint, color:PALETTE[cat.color].text}}, cat.name) : null),
           task.note ? h('div', {className:'text-[11px] text-inkfaint truncate mt-0.5', title:task.note}, task.note) : null),
         h('div', {className:'row-actions flex items-center gap-0.5 transition-smooth shrink-0'},
-          task.status!=='waiting' ? h('button', {onClick:function(){ props.onRestore(task.id); }, 'aria-label':'استرجاع', title:'استرجاع لـ Waiting',
-            className:'w-6 h-6 rounded-full flex items-center justify-center text-inkfaint hover:bg-surface hover:text-brand-deep transition-smooth'}, h(Icon,{name:'RotateCcw', size:12})) : null,
+          task.status!=='waiting' ? h('button', {onClick:function(){ props.onRestore(task.id); }, 'aria-label':task.status==='wishlist'?'سحب إلى المهام العاجلة':'استرجاع', title:task.status==='wishlist'?'سحب إلى المهام العاجلة':'استرجاع لـ Waiting',
+            className:'w-6 h-6 rounded-full flex items-center justify-center text-inkfaint hover:bg-surface hover:text-brand-deep transition-smooth'}, h(Icon,{name:task.status==='wishlist'?'ArrowUpRight':'RotateCcw', size:12})) : null,
+          task.status==='waiting' && props.onWish ? h('button', {onClick:function(){ props.onWish(task.id); }, 'aria-label':'نقل إلى قائمة الأمنيات', title:'نقل إلى قائمة الأمنيات',
+            className:'w-6 h-6 rounded-full flex items-center justify-center text-inkfaint hover:bg-surface hover:text-[var(--pal-amber-text)] transition-smooth'}, h(Icon,{name:'Bookmark', size:12})) : null,
           task.status==='waiting' ? h('button', {onClick:function(){ props.onPostpone(task.id); }, 'aria-label':'تأجيل', title:'تأجيل',
             className:'w-6 h-6 rounded-full flex items-center justify-center text-inkfaint hover:bg-surface hover:text-ink transition-smooth'}, h(Icon,{name:'Clock', size:12})) : null,
           h('button', {onClick:function(){ props.onEdit(task); }, 'aria-label':'تعديل', title:'تعديل',
@@ -4502,13 +4518,15 @@
     var doneToday = done.filter(function(t){ return t.doneOn===todayK; }).length;
     var allCleared = waiting.length===0 && doneToday>0;
     var cg = props.collapsed, toggle = props.onToggleCollapse;
-    var sections = props.sections || ['active','postponed','done'];
+    var wishlist = items.filter(function(t){return t.status==='wishlist';});
+    var sections = props.sections || ['active','wishlist','postponed','done'];
+    var showWishlist = sections.indexOf('wishlist')>-1;
     var showActive = sections.indexOf('active')>-1, showPostponed = sections.indexOf('postponed')>-1, showDone = sections.indexOf('done')>-1;
     var empty = items.length===0;
 
     var rowHandlers = {
       onComplete:props.onComplete, onPostpone:props.onPostpone, onRestore:props.onRestore,
-      onEdit:props.onEdit, onDelete:props.onDelete, onToggleSubtask:props.onToggleSubtask
+      onEdit:props.onEdit, onDelete:props.onDelete, onToggleSubtask:props.onToggleSubtask, onWish:props.onWish
     };
 
     if(empty){
@@ -4529,7 +4547,11 @@
             list.length ? h(TaskRowListDraggable, {list:list, categories:categories, rowHandlers:rowHandlers, onReorderItem:props.onReorderItem, onReorderTaskSubtask:props.onReorderTaskSubtask})
               : h('p', {className:'text-[11.5px] text-inkfaint px-1 py-1.5'}, 'لا توجد مهام'));
         })) : null,
-      showActive && (showPostponed || showDone) ? h('div', {className:'h-px bg-line my-2'}) : null,
+      showActive && (showWishlist || showPostponed || showDone) ? h('div', {className:'h-px bg-line my-2'}) : null,
+      showWishlist ? h(TaskGroupSection, {meta:{label:'قائمة الأمنيات', icon:'Bookmark', tone:'amber'}, count:wishlist.length, collapsed:!!cg.wishlist, onToggle:function(){ toggle('wishlist'); }, onDropTask:props.onMoveTask ? function(id){ props.onMoveTask(id, 'wishlist'); } : null},
+        wishlist.length ? h(TaskRowListDraggable, {list:wishlist, categories:categories, rowHandlers:rowHandlers, showPriority:true, onReorderItem:props.onReorderItem, onReorderTaskSubtask:props.onReorderTaskSubtask})
+          : h('p', {className:'text-[11.5px] text-inkfaint px-1 py-1.5'}, 'اسحب أي مهمة هنا لتركنها لاحقًا')) : null,
+      showWishlist && (showPostponed || showDone) ? h('div', {className:'h-px bg-line my-2'}) : null,
       showPostponed ? h(TaskGroupSection, {meta:{label:'مؤجلة', icon:'Clock', tone:'violet'}, count:postponed.length, collapsed:!!cg.postponed, onToggle:function(){ toggle('postponed'); }, onDropTask:props.onMoveTask ? function(id){ props.onMoveTask(id, 'postponed'); } : null},
         postponed.length ? h(TaskRowListDraggable, {list:postponed, categories:categories, rowHandlers:rowHandlers, showPriority:true, onReorderItem:props.onReorderItem, onReorderTaskSubtask:props.onReorderTaskSubtask})
           : h('p', {className:'text-[11.5px] text-inkfaint px-1 py-1.5'}, 'لا توجد مهام')) : null,
@@ -4539,9 +4561,39 @@
           : h('p', {className:'text-[11.5px] text-inkfaint px-1 py-1.5'}, 'لا توجد مهام')) : null);
   }
 
+  function WishlistCard(props){
+    var items = props.items.filter(function(t){ return t.status==='wishlist'; });
+    var ov = useState(false); var over=ov[0], setOver=ov[1];
+    var rowHandlers = { onComplete:props.onComplete, onPostpone:props.onPostpone, onRestore:props.onRestore, onEdit:props.onEdit, onDelete:props.onDelete, onToggleSubtask:props.onToggleSubtask };
+    var collapsed = !!props.collapsed[ 'wishlist-card' ];
+    return h('div', {className:'wl-card p-5'+(over?' is-task-over':''),
+      onDragOver:function(e){ if(!TASK_DRAG.id) return; e.preventDefault(); try{ e.dataTransfer.dropEffect='move'; }catch(err){} if(!over) setOver(true); },
+      onDragLeave:function(e){ if(!e.currentTarget.contains(e.relatedTarget)) setOver(false); },
+      onDrop:function(e){ setOver(false); if(!TASK_DRAG.id) return; e.preventDefault(); props.onMoveTask(TASK_DRAG.id, 'wishlist'); }},
+      h('div', {className:'flex items-center justify-between gap-2'+(collapsed?'':' mb-4')},
+        h('button', {type:'button', onClick:function(){ props.onToggleCollapse('wishlist-card'); }, 'aria-expanded':!collapsed, className:'flex items-center gap-2.5 min-w-0 flex-1 text-right focus-ring rounded-xl'},
+          h('span', {className:'wl-ico'}, h(Icon,{name:'Bookmark', size:15})),
+          h('span', {className:'min-w-0'},
+            h('h3', {className:'text-[14.5px] font-extrabold leading-tight'}, 'قائمة الأمنيات'),
+            h('p', {className:'text-[11px] font-medium text-inkfaint mt-0.5 truncate'}, 'مهام للمستقبل بدون زحمة')),
+          h('span', {className:'wl-badge num mr-1'}, items.length),
+          h('span', {className:'text-inkfaint transition-smooth', style:{transform: collapsed?'rotate(-90deg)':'rotate(0deg)'}}, h(Icon,{name:'ChevronDown', size:14}))),
+        h('button', {onClick:props.onAddWish, 'aria-label':'إضافة إلى قائمة الأمنيات', className:'wl-add shrink-0'},
+          h(Icon,{name:'Plus', size:12, strokeWidth:2.6}), 'فكرة')),
+      h('div', {className:'grid-expand '+(collapsed?'':'is-open')},
+        h('div', null,
+          items.length
+            ? h('div', {className:'wl-scroll space-y-2'}, h(TaskRowListDraggable, {list:items, categories:props.categories, rowHandlers:Object.assign(rowHandlers,{}), showPriority:true, onReorderItem:props.onReorderItem, onReorderTaskSubtask:props.onReorderTaskSubtask}))
+            : h('div', {className:'wl-empty'},
+                h(Icon,{name:'Bookmark', size:20, strokeWidth:1.6}),
+                h('p', {className:'text-[12.5px] font-bold text-inksoft'}, 'ما في أمنيات بعد'),
+                h('p', {className:'text-[11.5px] leading-relaxed'}, 'اسحب أي مهمة إلى هنا لتركنها بكل تفاصيلها، وارجع اسحبها متى شئت.')))));
+  }
+
   function TasksSidebar(props){
     return h('aside', {className:'hidden xl:block tasks-aside shrink-0'},
-      h('div', {className:'sticky top-[88px] bg-surface border border-line rounded-[22px] shadow-soft p-5'},
+      h('div', {className:'sticky top-[88px] max-h-[calc(100vh-104px)] overflow-y-auto overscroll-contain tasks-stack space-y-4 -mx-1 px-1 pb-2 -mb-2'},
+      h('div', {className:'bg-surface border border-line rounded-[22px] shadow-soft p-5'},
         h('div', {className:'flex items-center justify-between mb-4'},
           h('div', {className:'flex items-center gap-2'},
             h('span', {ref:props.iconRef, className:'w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0', style:{background: props.iconGrad || 'var(--grad-ink)'}}, h(Icon,{name:props.icon || 'ListChecks', size:15})),
@@ -4549,7 +4601,8 @@
           props.onAdd ? h('button', {onClick:props.onAdd, 'aria-label':'مهمة جديدة',
             className:'flex items-center gap-1 h-8 px-3 rounded-full bg-ink text-white text-[12px] font-bold hover:opacity-90 active:scale-95 transition-smooth'},
             h(Icon,{name:'Plus', size:12, strokeWidth:2.6}), 'مهمة') : null),
-        h(TasksSidebarContent, props)));
+        h(TasksSidebarContent, props)),
+      props.withWishlist ? h(WishlistCard, props) : null));
   }
 
   function TasksDrawer(props){
@@ -4647,7 +4700,11 @@
     function moveTask(id, dest){
       var target = itemsRef.current.filter(function(it){ return it.id===id; })[0];
       if(!target) return;
-      if(dest==='postponed'){
+      if(dest==='wishlist'){
+        if(target.status==='wishlist') return;
+        patchItem(id, function(){ return {status:'wishlist', doneOn:null}; });
+        toast.push({message:'تم نقل المهمة إلى قائمة الأمنيات', icon:'Bookmark'});
+      } else if(dest==='postponed'){
         if(target.status==='postponed') return;
         patchItem(id, function(){ return {status:'postponed'}; });
         toast.push({message:'تم نقل المهمة إلى المؤجلة', icon:'Clock'});
@@ -4665,7 +4722,12 @@
       }
     }
     function onPostpone(id){ setStatus(id,'postponed'); toast.push({message:'تم تأجيل المهمة', icon:'Clock'}); }
-    function onRestore(id){ setStatus(id,'waiting'); toast.push({message:'تم إرجاع المهمة إلى Waiting', icon:'RotateCcw'}); }
+    function onRestore(id){
+      var t = itemsRef.current.filter(function(it){ return it.id===id; })[0];
+      var fromWish = t && t.status==='wishlist';
+      setStatus(id,'waiting');
+      toast.push(fromWish ? {message:'تم سحب المهمة إلى المهام العاجلة', icon:'ArrowUpRight'} : {message:'تم إرجاع المهمة إلى Waiting', icon:'RotateCcw'});
+    }
     function onToggleSubtask(taskId, subId){
       patchItem(taskId, function(it){
         return { subtasks: it.subtasks.map(function(s){ return s.id===subId ? Object.assign({},s,{done:!s.done}) : s; }) };
@@ -4741,11 +4803,11 @@
       items: tstate.items, categories: tstate.groups, collapsed: collapsed, onToggleCollapse: toggleCollapse,
       onComplete:onComplete, onPostpone:onPostpone, onRestore:onRestore, onToggleSubtask:onToggleSubtask,
       onEdit:function(t){ setModalTask(t); }, onDelete:function(t){ setDeleteTask(t); },
-      onAdd:function(){ setModalTask({}); }, onMoveTask:moveTask, onReorderItem:reorderItem, onReorderTaskSubtask:reorderTaskSubtask
+      onAdd:function(){ setModalTask({}); }, onAddWish:function(){ setModalTask({status:'wishlist'}); }, onWish:function(id){ moveTask(id,'wishlist'); }, onMoveTask:moveTask, onReorderItem:reorderItem, onReorderTaskSubtask:reorderTaskSubtask
     };
 
     return {
-      sidebarActive: h(TasksSidebar, Object.assign({sections:['active'], title:'المهام العاجلة', icon:'Zap', iconGrad:'var(--grad-ink)', iconRef:urgentIconRef}, sharedProps)),
+      sidebarActive: h(TasksSidebar, Object.assign({sections:['active'], title:'المهام العاجلة', icon:'Zap', iconGrad:'var(--grad-ink)', iconRef:urgentIconRef, withWishlist:true}, sharedProps)),
       sidebarArchive: h(TasksSidebar, Object.assign({sections:['postponed','done'], title:'أرشيف المهام', icon:'Archive', iconGrad:'linear-gradient(135deg,#9694ff,#6a67e6)', onAdd:null}, sharedProps)),
       overlays: h(Fragment, null,
         showBurst ? h(ConfettiBurst, {key:burstKey, count:26, origin:burstOrigin, onDone:function(){ setShowBurst(false); }}) : null,
@@ -4913,6 +4975,7 @@
 
     var waiting = items.filter(function(t){ return t.status==='waiting'; });
     var postponed = items.filter(function(t){ return t.status==='postponed'; });
+    var wishlistItems = items.filter(function(t){ return t.status==='wishlist'; });
     var done = items.filter(function(t){ return t.status==='done'; });
     var doneToday = done.filter(function(t){ return t.doneOn===todayK; }).length;
     var overdue = waiting.filter(isTaskOverdue).length;
@@ -4929,12 +4992,13 @@
       return true;
     }
     var hasNoCat = items.some(function(t){ return !t.groupId; });
-    var rowHandlers = { onComplete:props.onComplete, onPostpone:props.onPostpone, onRestore:props.onRestore, onEdit:props.onEdit, onDelete:props.onDelete, onToggleSubtask:props.onToggleSubtask };
+    var rowHandlers = { onComplete:props.onComplete, onPostpone:props.onPostpone, onRestore:props.onRestore, onEdit:props.onEdit, onDelete:props.onDelete, onToggleSubtask:props.onToggleSubtask, onWish:props.onWish };
     var filtering = !!nq || catF!=='all';
 
     var statusOpts = [
       {key:'active', label:'نشطة · '+arNum(waiting.length)},
       {key:'postponed', label:'مؤجلة · '+arNum(postponed.length)},
+      {key:'wishlist', label:'أمنيات · '+arNum(wishlistItems.length)},
       {key:'done', label:'مكتملة · '+arNum(done.length)}
     ];
 
@@ -4967,11 +5031,12 @@
           }));
       }
     } else {
-      var base = (status==='done' ? done.slice().sort(function(a,b){ return (b.doneOn||'') < (a.doneOn||'') ? -1 : 1; }) : postponed).filter(pass);
+      var isWish = status==='wishlist';
+      var base = (status==='done' ? done.slice().sort(function(a,b){ return (b.doneOn||'') < (a.doneOn||'') ? -1 : 1; }) : isWish ? wishlistItems : postponed).filter(pass);
       main = h('div', {className:'tk-card'},
-        h(SectionHead, {icon: status==='done' ? 'CheckCircle2' : 'Clock', title: status==='done' ? 'المهام المكتملة' : 'المهام المؤجلة', sub: status==='done' ? 'يمكنك استرجاع أي مهمة إلى النشطة' : 'مهام تنتظر الوقت المناسب'}),
+        h(SectionHead, {icon: status==='done' ? 'CheckCircle2' : isWish ? 'Bookmark' : 'Clock', title: status==='done' ? 'المهام المكتملة' : isWish ? 'قائمة الأمنيات' : 'المهام المؤجلة', sub: status==='done' ? 'يمكنك استرجاع أي مهمة إلى النشطة' : isWish ? 'مهام للمستقبل — بكل تفاصيلها، اسحب منها وقتما تريد' : 'مهام تنتظر الوقت المناسب'}),
         base.length ? h('div', {className:'space-y-2'}, h(TaskRowListDraggable, {list:base, categories:categories, rowHandlers:rowHandlers, showPriority:true, onReorderItem:props.onReorderItem, onReorderTaskSubtask:props.onReorderTaskSubtask}))
-          : h('p', {className:'text-[12.5px] font-bold text-inkfaint text-center py-10'}, filtering ? 'لا نتائج مطابقة.' : (status==='done' ? 'لم تُكمل أي مهمة بعد.' : 'لا توجد مهام مؤجلة.')));
+          : h('p', {className:'text-[12.5px] font-bold text-inkfaint text-center py-10'}, filtering ? 'لا نتائج مطابقة.' : (status==='done' ? 'لم تُكمل أي مهمة بعد.' : isWish ? 'قائمة الأمنيات فارغة.' : 'لا توجد مهام مؤجلة.')));
     }
 
     /* ---------- page ---------- */
