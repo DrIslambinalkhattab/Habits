@@ -5046,7 +5046,7 @@
     function onLoad(){
       var d = doc(); if(!d) { setLoading(false); return; }
       var st = d.createElement('style');
-      st.textContent = 'html,body{height:auto!important;min-height:0!important;overflow-y:hidden!important}#reader{overscroll-behavior:contain}#reader *{overscroll-behavior:contain}';
+      st.textContent = 'html,body{height:auto!important;min-height:0!important;overflow-y:hidden!important}#reader{overscroll-behavior:auto}';
       d.head.appendChild(st);
       syncTheme(); measure();
       if(window.ResizeObserver){ new ResizeObserver(measure).observe(d.body); }
@@ -5061,18 +5061,6 @@
       window.addEventListener('resize', measure);
       return function(){ mo.disconnect(); window.removeEventListener('resize', measure); };
     }, []);
-    /* Lock the host page while the reader is open so it stays fixed in the viewport */
-    useEffect(function(){
-      if(!reading) return;
-      var de = document.documentElement, bd = document.body;
-      var y = window.scrollY, pd = de.style.overflow, pb = bd.style.cssText;
-      de.style.overflow = 'hidden'; de.style.overscrollBehavior = 'none';
-      bd.style.cssText += ';position:fixed;top:-'+y+'px;left:0;right:0;width:100%;overflow:hidden';
-      return function(){
-        de.style.overflow = pd; de.style.overscrollBehavior = '';
-        bd.style.cssText = pb; window.scrollTo(0, y);
-      };
-    }, [reading]);
     return h('div', {className:'relative', style:{height:height+'px', width:'100vw', marginInline:'calc(50% - 50vw)', marginTop:'-24px', marginBottom:'-96px', minHeight:'60vh'}},
       loading ? h('div', {className:'absolute inset-0 flex flex-col items-center justify-center gap-3 text-inksoft', 'aria-live':'polite'},
         h(Icon, {name:'BookOpen', size:26, strokeWidth:1.6}),
