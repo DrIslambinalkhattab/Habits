@@ -1849,7 +1849,7 @@
         h('div', {className:'flex items-center gap-2.5 shrink-0 justify-self-start'},
           h('div', {className:'w-9 h-9 rounded-[10px] flex items-center justify-center text-white shrink-0 shadow-[0_2px_6px_-1px_rgba(46,110,147,0.5)]', style:{background:'var(--grad-brand)'}}, h(Icon,{name:'Target', size:16, strokeWidth:2})),
           h('span', {className:'hidden sm:inline text-[17px] font-extrabold tracking-tightish'}, 'أثر')),
-        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'},{key:'history',label:'السجل'}], value:props.view, onChange:props.setView})),
+        h('div', {className:'shrink-0 justify-self-center'}, h(SegmentedControl, {options:[{key:'today',label:'اليوم'},{key:'tasks',label:'المهام'},{key:'overview',label:'الإحصائيات'},{key:'history',label:'السجل'},{key:'hisn',label:'حصن المسلم'}], value:props.view, onChange:props.setView})),
         h('div', {className:'flex items-center gap-2 shrink-0 justify-self-end'},
           h('button', {onClick:function(){ setSfxOn(SFX.toggle()); }, 'aria-label':sfxOn?'كتم أصوات الإنجاز':'تشغيل أصوات الإنجاز', 'aria-pressed':sfxOn, title:sfxOn?'الصوت: مفعّل':'الصوت: مكتوم',
             className:'w-9 h-9 rounded-full flex items-center justify-center hover:bg-linesoft transition-smooth focus-ring '+(sfxOn?'text-inksoft hover:text-ink':'text-inkfaint')}, h(Icon,{name:sfxOn?'Volume':'VolumeX', size:16})),
@@ -5028,6 +5028,28 @@
           }}))));
   }
 
+  /* ================= HISN VIEW (حصن المسلم) ================= */
+  var HISN_SRC = 'hisn.html';
+  function HisnView(){
+    var ls = useState(true), loading = ls[0], setLoading = ls[1];
+    var ref = useRef(null);
+    function syncTheme(){
+      try{ var d = ref.current && ref.current.contentDocument; if(d && d.documentElement) d.documentElement.setAttribute('data-theme', currentTheme()); }catch(e){}
+    }
+    useEffect(function(){
+      var mo = new MutationObserver(syncTheme);
+      mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+      return function(){ mo.disconnect(); };
+    }, []);
+    return h('div', {className:'relative w-full rounded-[22px] overflow-hidden border border-line bg-surface shadow-premium', style:{height:'calc(100vh - 68px - 56px - env(safe-area-inset-top,0px))', minHeight:'520px'}},
+      loading ? h('div', {className:'absolute inset-0 flex flex-col items-center justify-center gap-3 text-inksoft', 'aria-live':'polite'},
+        h(Icon, {name:'BookOpen', size:26, strokeWidth:1.6}),
+        h('span', {className:'text-[13px] font-bold'}, 'جارٍ تحميل حصن المسلم…')) : null,
+      h('iframe', {ref:ref, src:HISN_SRC, title:'حصن المسلم', loading:'lazy',
+        onLoad:function(){ syncTheme(); setLoading(false); },
+        style:{width:'100%', height:'100%', border:0, display:'block', opacity:loading?0:1, transition:'opacity .35s ease'}}));
+  }
+
   /* ================= HISTORY VIEW (السجل) ================= */
   var HR_WD = ['سبت','أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة'];
   function hrTone(r){ return r===null ? 'slate' : r>=1 ? 'green' : r>=0.6 ? 'sky' : r>=0.3 ? 'amber' : 'rose'; }
@@ -5612,6 +5634,7 @@
     var paletteCommands = [
       {id:'nav-today', group:'nav', label:'اليوم', icon:'CalendarDays', kbd:['1'], keywords:'home today الرئيسية', run:function(){ setView('today'); }},
       {id:'nav-overview', group:'nav', label:'نظرة عامة', icon:'BarChart3', kbd:['2'], keywords:'الإحصائيات overview stats', run:function(){ setView('overview'); }},
+      {id:'nav-hisn', group:'nav', label:'حصن المسلم', icon:'BookOpen', kbd:['5'], keywords:'حصن المسلم اذكار أدعية hisn azkar dua', run:function(){ setView('hisn'); }},
       {id:'nav-history', group:'nav', label:'السجل', icon:'Clock', kbd:['4'], keywords:'history log سجل الأيام السابقة', run:function(){ setView('history'); }},
       {id:'nav-tasks', group:'nav', label:'تبويب المهام', icon:'ListChecks', kbd:['3'], keywords:'tasks urgent العاجلة المهام', run:goTasks},
       {id:'act-habit', group:'act', label:'عادة جديدة', icon:'Plus', kbd:['N'], keywords:'add new habit إضافة', run:function(){ setModalHabit({}); }},
@@ -5651,6 +5674,7 @@
         else if(k==='1'){ e.preventDefault(); setView('today'); }
         else if(k==='2'){ e.preventDefault(); setView('overview'); }
         else if(k==='4'){ e.preventDefault(); setView('history'); }
+        else if(k==='5' || k==='٥'){ e.preventDefault(); setView('hisn'); }
         else if(k==='3'){ e.preventDefault(); goTasksRef.current(); }
         else if(k==='d' || k==='D' || k==='ي'){ e.preventDefault(); toggleThemeRef.current(); }
         else if(k==='?' || k==='؟'){ e.preventDefault(); setShowShortcuts(true); }
@@ -5686,6 +5710,7 @@
               })) : null,
             view==='tasks' ? h(TasksView, tasksModule.shared) : null,
             view==='overview' ? h(OverviewView, {habits:state.habits, progress:state.progress, categories:state.categories, periods:state.periods, priorities:state.priorities, onAdd:function(){ setModalHabit({}); }}) : null,
+            view==='hisn' ? h(HisnView, null) : null,
             view==='history' ? h(HistoryView, {habits:state.habits, progress:state.progress, categories:state.categories, tasks:tasksModule.items, taskGroups:tasksModule.categories}) : null),
           view==='today' ? tasksModule.sidebarArchive : null),
         h('button', {onClick:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, className:'md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white shadow-raised active:scale-95 transition-smooth'},
