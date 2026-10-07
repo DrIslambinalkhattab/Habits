@@ -444,6 +444,11 @@
   .tk-empty { display:flex; flex-direction:column; align-items:center; text-align:center; padding:56px 20px; }
   @media (max-width:640px){ .tk-hero{ padding:18px; } .tk-qa-prio{ display:none; } }
   @media (prefers-reduced-motion: reduce){ .tk-week-bar, .tk-hbar-fill, .tk-focus-row { transition:none } }
+  /* ===== Hisn frame (rounded premium container) ===== */
+  .hisn-frame{position:relative;width:100%;min-height:60vh;border:1px solid var(--color-line);border-radius:28px;overflow:hidden;background:linear-gradient(180deg,var(--color-surface),var(--color-raised));box-shadow:0 1px 2px rgba(22,33,44,.04),0 24px 48px -28px rgba(22,33,44,.28);transition:box-shadow .35s ease,border-color .35s ease}
+  .hisn-frame:hover{border-color:color-mix(in srgb,var(--color-brand) 22%,var(--color-line));box-shadow:0 1px 2px rgba(22,33,44,.04),0 30px 60px -28px rgba(22,33,44,.34)}
+  .hisn-frame iframe{border-radius:inherit}
+  @media (max-width:640px){ .hisn-frame{border-radius:22px} }
   /* View transition (today / overview) */
   @keyframes viewIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
   .view-enter { animation: viewIn .22s cubic-bezier(.2,.8,.2,1) both; }
@@ -5061,7 +5066,7 @@
       window.addEventListener('resize', measure);
       return function(){ mo.disconnect(); window.removeEventListener('resize', measure); };
     }, []);
-    return h('div', {className:'relative', style:{height:height+'px', width:'100vw', marginInline:'calc(50% - 50vw)', marginTop:'-24px', marginBottom:'-96px', minHeight:'60vh'}},
+    return h('div', {className:'hisn-frame', style:{height:(height+2)+'px'}},
       loading ? h('div', {className:'absolute inset-0 flex flex-col items-center justify-center gap-3 text-inksoft', 'aria-live':'polite'},
         h(Icon, {name:'BookOpen', size:26, strokeWidth:1.6}),
         h('span', {className:'text-[13px] font-bold'}, 'جارٍ تحميل حصن المسلم…')) : null,
