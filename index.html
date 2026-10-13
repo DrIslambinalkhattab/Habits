@@ -5133,12 +5133,17 @@
   }
 
   /* ================= HISN VIEW (حصن المسلم) ================= */
-  var HISN_SRC = 'hisn.html';
+  var HISN_SRC = 'https://drislambinalkhattab.github.io/Hisn/';
   function HisnView(){
     var ls = useState(true), loading = ls[0], setLoading = ls[1];
     var ref = useRef(null);
     function doc(){ try{ return ref.current && ref.current.contentDocument; }catch(e){ return null; } }
-    function syncTheme(){ var d = doc(); if(d && d.documentElement) d.documentElement.setAttribute('data-theme', currentTheme()); }
+    function syncTheme(){
+      var d = doc();
+      if(d && d.documentElement){ d.documentElement.setAttribute('data-theme', currentTheme()); return; }
+      /* موقع خارجي (cross-origin): لا وصول للـ DOM، نرسل الثيم عبر postMessage */
+      try{ if(ref.current && ref.current.contentWindow) ref.current.contentWindow.postMessage({type:'theme', theme:currentTheme()}, 'https://drislambinalkhattab.github.io'); }catch(e){}
+    }
     function onLoad(){ syncTheme(); setLoading(false); }
     useEffect(function(){
       var mo = new MutationObserver(syncTheme);
