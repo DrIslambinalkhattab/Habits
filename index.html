@@ -4,6 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>أثر — نظام تتبع العادات</title>
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -219,6 +223,34 @@
   @media (min-width:2800px){ .app-shell,.app-wrap{ max-width:3200px } .tasks-aside{ width:400px } .hero-wide{ max-width:1700px } }
   @media (min-width:1600px){ .hero-scale{ zoom:1.1 } }
   @media (min-width:2200px){ .hero-scale{ zoom:1.2 } }
+
+  /* ---- Resizable split: habits ⇄ tasks ---- */
+  .tasks-aside{ transition:width .32s cubic-bezier(.2,.8,.2,1), margin .32s cubic-bezier(.2,.8,.2,1), opacity .22s ease, visibility 0s linear 0s; }
+  .app-shell.sp-a > .side-a{ width:var(--aside-a); }
+  .app-shell.sp-b > .side-b{ width:var(--aside-b); }
+  .app-shell.sp-any > .app-main{ max-width:none; }
+  .app-shell.co-a > .side-a, .app-shell.co-b > .side-b{ width:0 !important; opacity:0; visibility:hidden; pointer-events:none; overflow:hidden; transition-delay:0s,0s,0s,.32s; }
+  .app-shell.co-a > .side-a{ margin-inline-end:-24px; }
+  .app-shell.co-b > .side-b{ margin-inline-start:-24px; }
+  .split-h{ display:none; position:relative; flex:none; width:0; align-self:stretch; margin-inline:-12px; z-index:25; }
+  @media (min-width:1280px){ .split-h{ display:block; } }
+  .split-hit{ position:absolute; top:0; bottom:0; left:-11px; width:22px; cursor:col-resize; touch-action:none; outline:none; -webkit-tap-highlight-color:transparent; }
+  .split-rail{ position:sticky; top:88px; height:calc(100vh - 120px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; pointer-events:none; }
+  .split-line{ position:absolute; top:4px; bottom:4px; left:50%; width:2px; margin-left:-1px; border-radius:2px; background:linear-gradient(180deg, transparent, var(--color-brand) 16%, var(--color-brand) 84%, transparent); opacity:0; transform:scaleY(.7); transition:opacity .22s ease, transform .4s cubic-bezier(.2,.8,.2,1); }
+  .split-grip{ position:relative; width:16px; height:46px; border-radius:9999px; display:flex; align-items:center; justify-content:center; background:var(--color-surface); border:1px solid var(--color-line); color:var(--color-inkfaint); box-shadow:0 1px 2px rgba(15,23,42,.05), 0 10px 20px -12px rgba(15,23,42,.32); opacity:.5; transition:opacity .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .split-btn{ position:relative; pointer-events:auto; cursor:pointer; width:26px; height:26px; border-radius:9999px; display:flex; align-items:center; justify-content:center; background:var(--color-surface); border:1px solid var(--color-line); color:var(--color-inksoft); box-shadow:0 8px 16px -9px rgba(15,23,42,.4); opacity:0; transform:scale(.7); transition:opacity .2s ease, transform .3s cubic-bezier(.2,.8,.2,1), background .15s ease, color .15s ease, border-color .15s ease; }
+  .split-btn:hover{ background:var(--color-brand); border-color:var(--color-brand); color:#fff; }
+  .split-btn:active{ transform:scale(.92); }
+  .split-hit:hover .split-line, .split-hit:focus-visible .split-line{ opacity:.55; transform:scaleY(1); }
+  .split-hit:hover .split-grip, .split-hit:focus-visible .split-grip, .split-h.is-collapsed .split-grip{ opacity:1; color:var(--color-brand); border-color:color-mix(in srgb, var(--color-brand) 45%, var(--color-line)); }
+  .split-hit:hover .split-btn, .split-hit:focus-visible .split-btn, .split-h.is-collapsed .split-btn{ opacity:1; transform:scale(1); }
+  .split-hit:focus-visible .split-grip{ box-shadow:0 0 0 3px color-mix(in srgb, var(--color-brand) 28%, transparent); }
+  .split-h.is-active .split-line{ opacity:1; }
+  .split-h.is-active .split-grip{ opacity:1; color:#fff; background:var(--color-brand); border-color:var(--color-brand); transform:scale(1.08); }
+  .split-h.is-active .split-btn{ opacity:0; }
+  body.is-split-dragging, body.is-split-dragging *{ cursor:col-resize !important; user-select:none !important; -webkit-user-select:none !important; }
+  body.is-split-dragging .tasks-aside{ transition:none !important; }
+  @media (prefers-reduced-motion: reduce){ .tasks-aside, .split-line, .split-grip, .split-btn{ transition:none } }
 
   /* ---- Hero (Today) ---- */
   .hero-blob { position:absolute; border-radius:9999px; pointer-events:none; will-change:transform, opacity; }
@@ -4624,7 +4656,7 @@
   }
 
   function TasksSidebar(props){
-    return h('aside', {className:'hidden xl:block tasks-aside shrink-0'},
+    return h('aside', {className:'hidden xl:block tasks-aside shrink-0'+(props.side ? ' side-'+props.side : '')},
       h('div', {className:'sticky top-[88px] max-h-[calc(100vh-104px)] overflow-y-auto overscroll-contain tasks-stack space-y-4 -mx-1 px-1 pb-2 -mb-2'},
       h('div', {className:'bg-surface border border-line rounded-[22px] shadow-soft p-5'},
         h('div', {className:'flex items-center justify-between mb-4'},
@@ -4840,8 +4872,8 @@
     };
 
     return {
-      sidebarActive: h(TasksSidebar, Object.assign({sections:['active'], title:'المهام العاجلة', icon:'Zap', iconGrad:'var(--grad-ink)', iconRef:urgentIconRef, withWishlist:true}, sharedProps)),
-      sidebarArchive: h(TasksSidebar, Object.assign({sections:['postponed','done'], title:'أرشيف المهام', icon:'Archive', iconGrad:'linear-gradient(135deg,#9694ff,#6a67e6)', onAdd:null}, sharedProps)),
+      sidebarActive: h(TasksSidebar, Object.assign({side:'a', sections:['active'], title:'المهام العاجلة', icon:'Zap', iconGrad:'var(--grad-ink)', iconRef:urgentIconRef, withWishlist:true}, sharedProps)),
+      sidebarArchive: h(TasksSidebar, Object.assign({side:'b', sections:['postponed','done'], title:'أرشيف المهام', icon:'Archive', iconGrad:'linear-gradient(135deg,#9694ff,#6a67e6)', onAdd:null}, sharedProps)),
       overlays: h(Fragment, null,
         showBurst ? h(ConfettiBurst, {key:burstKey, count:26, origin:burstOrigin, onDone:function(){ setShowBurst(false); }}) : null,
         hideFab ? null : h(TasksFAB, {onOpen:function(){ setDrawerOpen(true); }}),
@@ -5393,9 +5425,117 @@
             !tl.end ? h('button', {type:'button', onClick:function(){ setMore(more+10); }, className:'mt-4 w-full h-10 rounded-full border border-line text-[12.5px] font-extrabold text-inksoft hover:bg-linesoft hover:text-ink transition-smooth focus-ring'}, 'عرض المزيد') : null))));
   }
 
+  /* ================= RESIZABLE SPLIT (habits ⇄ tasks) ================= */
+  var SPLIT_KEY = 'athar.split.v1';
+  var SPLIT_MIN = 220, SPLIT_SNAP = 130, SPLIT_MAIN_MIN = 420, SPLIT_MAX = 820;
+  function loadSplit(){
+    try{
+      var r = JSON.parse(window.localStorage.getItem(SPLIT_KEY) || 'null');
+      if(r && typeof r === 'object'){
+        var num = function(v){ v = +v; return (v >= SPLIT_MIN && v <= SPLIT_MAX) ? Math.round(v) : null; };
+        return {a:num(r.a), b:num(r.b), ca:!!r.ca, cb:!!r.cb};
+      }
+    }catch(e){}
+    return {a:null, b:null, ca:false, cb:false};
+  }
+  function splitMax(shell, side){
+    var cs = window.getComputedStyle(shell);
+    var avail = shell.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var other = shell.querySelector(':scope > .side-' + (side === 'a' ? 'b' : 'a'));
+    var ow = other && other.offsetWidth ? other.offsetWidth : 0;
+    return Math.max(SPLIT_MIN, Math.min(SPLIT_MAX, avail - ow - (ow ? 48 : 24) - SPLIT_MAIN_MIN));
+  }
+  function SplitHandle(props){
+    var side = props.side, split = props.split;
+    var dragRef = useRef(null);
+    var actS = useState(false); var active = actS[0], setActive = actS[1];
+    var collapsed = side === 'a' ? split.ca : split.cb;
+    var rtl = document.documentElement.dir === 'rtl';
+
+    function sign(shell){
+      var r = window.getComputedStyle(shell).direction === 'rtl';
+      return side === 'a' ? (r ? -1 : 1) : (r ? 1 : -1);
+    }
+    function patch(fn){ props.setSplit(function(s){ var n = Object.assign({}, s); fn(n); return n; }); }
+    function commit(w){
+      patch(function(n){ if(w === 0){ n['c'+side] = true; } else { n['c'+side] = false; n[side] = w; } });
+    }
+    function paint(shell, w){
+      var cl = shell.classList;
+      if(w === 0){ cl.add('co-'+side); }
+      else { cl.remove('co-'+side); cl.add('sp-'+side); shell.style.setProperty('--aside-'+side, w+'px'); }
+      cl.add('sp-any');
+    }
+    function reset(){
+      var shell = props.shellRef.current;
+      if(shell){ shell.style.removeProperty('--aside-'+side); }
+      patch(function(n){ n[side] = null; n['c'+side] = false; });
+    }
+    function toggle(e){
+      e.stopPropagation();
+      patch(function(n){ n['c'+side] = !n['c'+side]; });
+    }
+    function onDown(e){
+      if(e.button) return;
+      var shell = props.shellRef.current; if(!shell) return;
+      var aside = shell.querySelector(':scope > .side-' + side); if(!aside) return;
+      e.preventDefault();
+      try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(_){}
+      dragRef.current = {x:e.clientX, w0: collapsed ? 0 : aside.getBoundingClientRect().width, sg:sign(shell), max:splitMax(shell, side), last:null};
+      document.body.classList.add('is-split-dragging');
+      setActive(true);
+    }
+    function onMove(e){
+      var d = dragRef.current, shell = props.shellRef.current; if(!d || !shell) return;
+      var raw = d.w0 + d.sg * (e.clientX - d.x);
+      var w = raw < SPLIT_SNAP ? 0 : Math.round(Math.min(d.max, Math.max(SPLIT_MIN, raw)));
+      if(d.last === w) return;
+      d.last = w; paint(shell, w);
+    }
+    function onUp(e){
+      var d = dragRef.current; if(!d) return;
+      dragRef.current = null;
+      document.body.classList.remove('is-split-dragging');
+      setActive(false);
+      try{ e.currentTarget.releasePointerCapture(e.pointerId); }catch(_){}
+      if(d.last !== null) commit(d.last);
+    }
+    function onKey(e){
+      var shell = props.shellRef.current; if(!shell) return;
+      var k = e.key;
+      if(k === 'Enter' || k === ' '){ e.preventDefault(); reset(); return; }
+      if(k !== 'ArrowLeft' && k !== 'ArrowRight') return;
+      e.preventDefault();
+      var aside = shell.querySelector(':scope > .side-' + side); if(!aside) return;
+      var step = sign(shell) * (k === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 64 : 24);
+      if(collapsed){ if(step > 0) patch(function(n){ n['c'+side] = false; }); return; }
+      var raw = aside.getBoundingClientRect().width + step;
+      commit(raw < SPLIT_SNAP ? 0 : Math.round(Math.min(splitMax(shell, side), Math.max(SPLIT_MIN, raw))));
+    }
+
+    var outward = ((side === 'a') === rtl) ? 'ChevronRight' : 'ChevronLeft';
+    var chev = collapsed ? (outward === 'ChevronRight' ? 'ChevronLeft' : 'ChevronRight') : outward;
+    var label = collapsed ? 'إظهار هذا القسم' : 'إخفاء هذا القسم';
+    return h('div', {className:'split-h' + (active ? ' is-active' : '') + (collapsed ? ' is-collapsed' : '')},
+      h('div', {className:'split-hit', role:'separator', 'aria-orientation':'vertical', tabIndex:0,
+          'aria-label':'تغيير عرض القسم — اسحب أو استخدم الأسهم، وانقر مرتين للإرجاع للوضع الافتراضي',
+          onPointerDown:onDown, onPointerMove:onMove, onPointerUp:onUp, onPointerCancel:onUp, onDoubleClick:reset, onKeyDown:onKey},
+        h('div', {className:'split-rail'},
+          h('span', {className:'split-line'}),
+          h('button', {type:'button', className:'split-btn', 'aria-label':label, title:label, onClick:toggle,
+              onPointerDown:function(e){ e.stopPropagation(); }, onDoubleClick:function(e){ e.stopPropagation(); }},
+            h(Icon, {name:chev, size:12, strokeWidth:2.6})),
+          h('span', {className:'split-grip'}, h(Icon, {name:'GripVertical', size:12})))));
+  }
+
   function AppInner(){
     var s = useState(loadState()); var state=s[0], setState=s[1];
     var vs = useState('today'); var view=vs[0], setView=vs[1];
+    var spS = useState(loadSplit); var split=spS[0], setSplit=spS[1];
+    var shellRef = useRef(null);
+    useEffect(function(){ try{ window.localStorage.setItem(SPLIT_KEY, JSON.stringify(split)); }catch(e){} }, [split]);
+    var splitStyle = {}; if(split.a) splitStyle['--aside-a'] = split.a+'px'; if(split.b) splitStyle['--aside-b'] = split.b+'px';
+    var splitCls = view!=='today' ? '' : (split.a?' sp-a':'')+(split.b?' sp-b':'')+(split.ca?' co-a':'')+(split.cb?' co-b':'')+((split.a||split.b||split.ca||split.cb)?' sp-any':'');
     var mh = useState(null); var modalHabit=mh[0], setModalHabit=mh[1];
     var ss = useState(false); var showSettings=ss[0], setShowSettings=ss[1]; var ad_ = useState(false); var showAdhan=ad_[0], setShowAdhan=ad_[1]; var rm_ = useState(false); var showReminders=rm_[0], setShowReminders=rm_[1];
     var ds = useState(null); var deleteTarget=ds[0], setDeleteTarget=ds[1];
@@ -5828,8 +5968,9 @@
       h('div', {className:'min-h-screen flex flex-col'},
         h(TopBar, {view:view, setView:setView, addLabel: view==='tasks' ? 'مهمة جديدة' : null, onAdd:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, onSettings:function(){ setShowSettings(true); }, onAdhan:function(){ setShowAdhan(true); }, onReminders:function(){ setShowReminders(true); }}),
         view==='today' ? h('div', {key:'hero-today', className:'view-enter'}, h(MaghribCountdown, null), h(HeroToday, {habits:state.habits, progress:state.progress})) : null,
-        h('div', {className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'},
+        h('div', {ref:shellRef, style:splitStyle, className:'flex-1 w-full mx-auto px-5 md:px-8 pt-6 pb-24 app-shell flex items-start justify-center gap-6'+splitCls},
           view==='today' ? tasksModule.sidebarActive : null,
+          view==='today' ? h(SplitHandle, {key:'sp-a', side:'a', shellRef:shellRef, split:split, setSplit:setSplit}) : null,
           h('main', {key:view, className:'view-enter min-w-0 flex-1 app-main'+(view==='overview'?' is-overview':'')+((view==='hisn'||view==='pomodoro')?' is-hisn':'')},
             view==='today' ? h(Fragment, null,
               h(Toolbar, {query:query, setQuery:setQuery, filter:filter, setFilter:setFilter, searchRef:searchRef, groupMode:groupMode, onGroupMode:switchGroupMode}),
@@ -5852,6 +5993,7 @@
             view==='hisn' ? h(HisnView, null) : null,
             view==='pomodoro' ? h(PomodoroView, null) : null,
             view==='history' ? h(HistoryView, {habits:state.habits, progress:state.progress, categories:state.categories, tasks:tasksModule.items, taskGroups:tasksModule.categories}) : null),
+          view==='today' ? h(SplitHandle, {key:'sp-b', side:'b', shellRef:shellRef, split:split, setSplit:setSplit}) : null,
           view==='today' ? tasksModule.sidebarArchive : null),
         h('button', {onClick:function(){ if(view==='tasks') tasksModule.openEditor(); else setModalHabit({}); }, className:'md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white shadow-raised active:scale-95 transition-smooth'},
           h(Icon,{name:'Plus', size:16, strokeWidth:2.4}), h('span',{className:'text-[13.5px] font-bold'}, view==='tasks' ? 'مهمة جديدة' : 'عادة جديدة'))),
